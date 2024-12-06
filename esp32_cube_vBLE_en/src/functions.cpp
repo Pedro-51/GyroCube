@@ -34,7 +34,78 @@ int32_t motors_speed_X;
 int32_t motors_speed_Y; 
 int32_t motors_speed_Z;
 bool balanceNotify = true;
+int DIR1;
+int ENC1_1;
+int ENC1_2;
+int PWM1;
+int PWM1_CH;
 
+int DIR2;
+int ENC2_1;
+int ENC2_2;
+int PWM2;
+int PWM2_CH;
+
+int DIR3;
+int ENC3_1;
+int ENC3_2;
+int PWM3;
+int PWM3_CH;
+int melody[] = {
+    NOTE_G5,4,
+    NOTE_C6,4,
+    NOTE_B5,4,
+    NOTE_AS5,8,
+    NOTE_B5,8,
+    NOTE_AS5,8,
+    // ----
+    NOTE_A5,8,
+    NOTE_GS5,4,
+    NOTE_G5,4,
+    NOTE_FS5,4,
+    // ----
+    NOTE_G5,4,
+    NOTE_A5,4,
+    NOTE_GS5,4,
+    NOTE_G5,8,
+    NOTE_GS5,8,
+    NOTE_G5,8,
+    // ----
+    NOTE_FS5,8,
+    NOTE_F5,4,
+    NOTE_E5,4,
+    NOTE_DS5,4,
+    // ----
+    NOTE_E5,4,
+    NOTE_G5,8,
+    NOTE_F5,8,
+    NOTE_F5,4,
+    NOTE_CS5,4,
+    // ----
+    NOTE_D5,4,
+    NOTE_G5,8,
+    NOTE_F5,8,
+    NOTE_F5,4,
+    NOTE_CS5,4,
+    // ----
+    NOTE_D5,4,
+    NOTE_B4,8,
+    NOTE_C5,8,
+    NOTE_CS5,8,
+    NOTE_D5,8,
+    NOTE_DS5,8,
+    NOTE_E5,8,
+    NOTE_F5,8,
+    // -----
+    NOTE_FS5,8,
+    NOTE_G5,8,
+    NOTE_GS5,8,
+    NOTE_A5,8,
+    NOTE_B5,8,
+    NOTE_A5,4,
+    NOTE_G5,4,
+    // -----
+  };
 void writeTo(byte device, byte address, byte value) {
   Wire.beginTransmission(device);
   Wire.write(address);
@@ -217,10 +288,7 @@ void angle_calc() {
   Acc_angleX = -atan2(AcYc, -AcZc) * 57.2958;
   robot_angleX = robot_angleX * Gyro_amount + Acc_angleX * (1.0 - Gyro_amount);
 
-  //Serial.print("AcX= "); Serial.print(AcX); Serial.print("  AcY= "); Serial.print(AcY); Serial.print("  AcZ= "); Serial.println(AcZ);
-  //Serial.print("angleX= "); Serial.print(Acc_angleX); Serial.print("  angleY= "); Serial.println(Acc_angleY);
-  //Serial.println(); Serial.println(); 
-  
+
   if (abs(AcX) < 2000 && abs(Acc_angleX) < 0.4 && abs(Acc_angleY) < 0.4 && !vertical_vertex && !vertical_edge) {
     robot_angleX = Acc_angleX;
     robot_angleY = Acc_angleY;
@@ -258,7 +326,6 @@ void battVoltage(double voltage) {
     batterylasttime = millis();
     char str[10];
     sprintf(str, "*bv*%.2f", voltage);
-    Serial.println(str);
     pSensorCharacteristic->setValue(str);
     pSensorCharacteristic->notify();
   }
@@ -360,16 +427,22 @@ void getSettings() {
   sprintf(str, "*se*%f|%f|%f|%f", eK1, eK2, eK3, eK4);
   pSensorCharacteristic->setValue(str);
   pSensorCharacteristic->notify();
+
+  sprintf(str, "*fv*%.02f", FIRMWARE_VERSION);
+  pSensorCharacteristic->setValue(str);
+  pSensorCharacteristic->notify();
+
+  sprintf(str, "*sm*%d|%d|%d", offsets.motor1, offsets.motor2, offsets.motor3);
+  pSensorCharacteristic->setValue(str);
+  pSensorCharacteristic->notify();
 }
 
 void setSettings(char s, char c) {
   switch(s){
     case SETTINGS_K1:
       if(c == SETTINGS_PLUS) {
-        Serial.println("k1 +");
         K1 += 1;
       } else if(c == SETTINGS_MINUS) {
-        Serial.println("k1 -");
         K1 -= 1;
       }
       getSettings();
@@ -377,89 +450,71 @@ void setSettings(char s, char c) {
     case SETTINGS_K2:
       if(c == SETTINGS_PLUS) {
         K2 += .5;
-        Serial.println("k2 +");
       } else if(c == SETTINGS_MINUS) {
-        Serial.println("k2 -");
         K2 -= .5;
       }
       getSettings();
       break;
     case SETTINGS_K3:
       if(c == SETTINGS_PLUS) {
-        Serial.println("k3 +");
         K3 += .05;
       } else if(c == SETTINGS_MINUS) {
-        Serial.println("k3 -");
         K3 -= .05;
       }
       getSettings();
       break;
     case SETTINGS_K4:
       if(c == SETTINGS_PLUS) {
-        Serial.println("k4 +");
         K4 += 0.001;
       } else if(c == SETTINGS_MINUS) {
-        Serial.println("k4 -");
         K4 -= 0.001;
       }
       getSettings();
       break;
     case SETTINGS_ZK2:
       if(c == SETTINGS_PLUS) {
-        Serial.println("zk2 +");
         zK2 += 0.1;
       } else if(c == SETTINGS_MINUS) {
-        Serial.println("zk3 -");
         zK2 -= 0.1;
       }
       getSettings();
       break;
     case SETTINGS_ZK3:
       if(c == SETTINGS_PLUS) {
-        Serial.println("zk3 +");
         zK3 += 0.05;
       } else if(c == SETTINGS_MINUS) {
-        Serial.println("zk3 +");
         zK3 -= 0.01;
       }
       getSettings();
       break;
     case SETTINGS_EK1:
       if(c == SETTINGS_PLUS) {
-        Serial.println("ek1 +");
         eK1 += 1;
       } else if(c == SETTINGS_MINUS) {
-        Serial.println("ek1 -");
         eK1 -= 1;
       }
       getSettings();
       break;
     case SETTINGS_EK2:
       if(c == SETTINGS_PLUS) {
-        Serial.println("ek2 +");
         eK2 += .5;
       } else if(c == SETTINGS_MINUS) {
-        Serial.println("ek2 -");
         eK2 -= .5;
       }
       getSettings();
       break;
     case SETTINGS_EK3:
       if(c == SETTINGS_PLUS) {
-        Serial.println("ek3 +");
         eK3 += .05;
       } else if(c == SETTINGS_MINUS) {
-        Serial.println("ek3 -");
         eK3 -= .05;
       }
       getSettings();
       break;
     case SETTINGS_EK4:
       if(c == SETTINGS_PLUS) {
-        Serial.println("ek4 +");
         eK4 += 0.001;
       } else if(c == SETTINGS_MINUS) {
-        Serial.println("ek4 -");
         eK4 -= 0.001;
       }
       getSettings();
@@ -670,9 +725,6 @@ void calibrate_edge() {
         return;
       }
   if (abs(AcX) > 7000 && abs(AcX) < 10000 && abs(AcY) < 2000) {
-      //Serial.print("X: "); SerialBT.print(AcX); SerialBT.print(" Y: "); SerialBT.print(AcY); SerialBT.print(" Z: "); SerialBT.println(AcZ + 16384);
-      //SerialBT.println("13");
-      Serial.println("Edge OK.");
       offsets.acXe = AcX;
       offsets.acYe = AcY;
       offsets.acZe = AcZ + 16384;
@@ -690,22 +742,16 @@ void calibrate_edge() {
 
     pSensorCharacteristic->setValue("*a*The angles are wrong!!!");
     pSensorCharacteristic->notify();
-    Serial.println("The angles are wrong!!!");
     beep();
     beep();
 }
 void calibrate_vertex() {
 
   if (abs(AcX) < 2000 && abs(AcY) < 2000) {
-    //Serial.print("X: "); SerialBT.print(AcX); SerialBT.print(" Y: "); SerialBT.print(AcY); SerialBT.print(" Z: "); SerialBT.println(AcZ + 16384);
     offsets.ID = 96;
     offsets.acXv = AcX;
     offsets.acYv = AcY;
     offsets.acZv = AcZ + 16384;
-    //SerialBT.println("12");
-    Serial.println("Vertex OK.");
-    Serial.println("Set the cube on Edge...");
-
 
     pSensorCharacteristic->setValue("*a*Vertex Accepted, now calibrate edge");
     pSensorCharacteristic->notify();
@@ -721,21 +767,20 @@ void calibrate_vertex() {
 
 void balancing(String type){
   if(deviceConnected && millis() - lasttime > 2000){
+    play=true;
     lasttime = millis();
     balanceNotify = true;
     char str[10];
     sprintf(str, "*b*%s", type);
-    Serial.print("Balancing:");
-    Serial.println(type);
     pSensorCharacteristic->setValue(str);
     pSensorCharacteristic->notify();
   }
 }
 void notBalancing(){
   if(deviceConnected && millis() - lasttime > 2000 && balanceNotify) {
+    play=false;
     lasttime = millis();
     balanceNotify= false;
-    Serial.println("Not Balancing");
     pSensorCharacteristic->setValue("*nb*0");
     pSensorCharacteristic->notify();
   }
@@ -764,4 +809,54 @@ void setLeds(char t, int r, int g, int b) {
     offsets.Red = r; offsets.Green = g; offsets.Blue = b;
   }
   save();
+}
+void musicLoop(void* pvParameters){
+  for(;;) {
+        for (int thisNote = 0; thisNote <= 88; thisNote+=2) {
+          int noteDuration = 1000 / melody[thisNote+1];
+          tone(BUZZER, melody[thisNote], noteDuration);
+
+          int pauseBetweenNotes = noteDuration * 1.30;
+          //delay(pauseBetweenNotes);
+          noTone(BUZZER);
+        }
+  }
+        
+  }
+void saveMotors(int mot1, int mot2, int mot3) {
+  offsets.motor1 = mot1;
+  offsets.motor2 = mot2;
+  offsets.motor3 = mot3;
+  save();
+
+  DIR1      = motors[mot1][0];
+  ENC1_1    = motors[mot1][1];
+  ENC1_2    = motors[mot1][2];
+  PWM1      = motors[mot1][3];
+  PWM1_CH   = motors[mot1][4];
+
+  DIR2      = motors[mot2][0];
+  ENC2_1    = motors[mot2][1];
+  ENC2_2    = motors[mot2][2];
+  PWM2      = motors[mot2][3];
+  PWM2_CH   = motors[mot2][4];
+
+  DIR3      = motors[mot3][0];
+  ENC3_1    = motors[mot3][1];
+  ENC3_2    = motors[mot3][2];
+  PWM3      = motors[mot3][3];
+  PWM3_CH   = motors[mot3][4];
+
+
+  attachInterrupt(ENC1_1, ENC1_READ, CHANGE);
+  attachInterrupt(ENC1_2, ENC1_READ, CHANGE);
+
+  attachInterrupt(ENC2_1, ENC2_READ, CHANGE);
+  attachInterrupt(ENC2_2, ENC2_READ, CHANGE);
+
+  attachInterrupt(ENC3_1, ENC3_READ, CHANGE);
+  attachInterrupt(ENC3_2, ENC3_READ, CHANGE);
+  
+
+
 }

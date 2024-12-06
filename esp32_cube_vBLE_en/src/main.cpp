@@ -18,7 +18,8 @@
 
 BLEServer* pServer = NULL;
 uint32_t value = 0;
-
+TaskHandle_t Task1;
+TaskHandle_t Task2;
 BLECharacteristic* pSensorCharacteristic;
 BLECharacteristic* pLedCharacteristic; 
 float gyroX;
@@ -37,7 +38,7 @@ int ledPin = 2; // Use the appropriate GPIO pin for your setup
 #define SENSOR_CHARACTERISTIC_UUID "19b10001-e8f2-537e-4f6c-d104768a1214"
 #define COM_CHARACTERISTIC_UUID "19b10002-e8f2-537e-4f6c-d104768a1214"
 
-
+bool play=false;
 
 void setup() {
   Serial.begin(115200);    
@@ -68,7 +69,7 @@ void setup() {
                       BLECharacteristic::PROPERTY_WRITE
                     );
 //   // Register the callback for the ON button characteristic
-  pLedCharacteristic->setCallbacks(new MyCharacteristicCallbacks(testMotors, calibrate_edge, calibrate_vertex, getSettings, setSettings, saveSettings, setLeds));
+  pLedCharacteristic->setCallbacks(new MyCharacteristicCallbacks(testMotors, calibrate_edge, calibrate_vertex, getSettings, setSettings, saveSettings, setLeds, saveMotors));
   
   // https://www.bluetooth.com/specifications/gatt/viewer?attributeXmlFile=org.bluetooth.descriptor.gatt.client_characteristic_configuration.xml
   // Create a BLE Descriptor
@@ -99,7 +100,43 @@ void setup() {
   }
   for (i=250;i>0;i-=10){colorLed(i, i*0.68, 0, 1, 3, 5);}
   colorLed(0, 0, 0, 1, 3, 5);
-  
+
+  EEPROM.get(0, offsets);
+
+  int m1=offsets.motor1;
+  int m2=offsets.motor2;
+  int m3=offsets.motor3;
+  if(m1 < 0 || m1 > 3){
+    m1=0;
+    m2=1;
+    m3=2;
+    offsets.motor1 = 0;
+    offsets.motor2 = 1;
+    offsets.motor3 = 2;
+    Serial.println("reseting pins");
+    save();
+  }
+    Serial.println(m1);
+    Serial.println(m2);
+    Serial.println(m3);
+  DIR1      = motors[m1][0];
+  ENC1_1    = motors[m1][1];
+  ENC1_2    = motors[m1][2];
+  PWM1      = motors[m1][3];
+  PWM1_CH   = motors[m1][4];
+
+  DIR2      = motors[m2][0];
+  ENC2_1    = motors[m2][1];
+  ENC2_2    = motors[m2][2];
+  PWM2      = motors[m2][3];
+  PWM2_CH   = motors[m2][4];
+
+  DIR3      = motors[m3][0];
+  ENC3_1    = motors[m3][1];
+  ENC3_2    = motors[m3][2];
+  PWM3      = motors[m3][3];
+  PWM3_CH   = motors[m3][4];
+
   pinMode(DIR1, OUTPUT);
   pinMode(ENC1_1, INPUT);
   pinMode(ENC1_2, INPUT);
@@ -127,7 +164,6 @@ void setup() {
   ledcAttachPin(PWM3, PWM3_CH);
   Motor3_control(0);
 
-  EEPROM.get(0, offsets);
   //offsets.ID = 0; // for debug
   if(offsets.ID == 255){
     offsets.ID = 0;
@@ -145,12 +181,20 @@ void setup() {
     eK1 = offsets.eK1; eK2 = offsets.eK2; eK3 = offsets.eK3; eK4 = offsets.eK4;
     calibrated = true;
   }
-
+play=false;
   angle_setup();
+  // xTaskCreatePinnedToCore (
+  //   musicLoop,     // Function to implement the task
+  //   "musicLoop",   // Name of the task
+  //   10000,      // Stack size in bytes
+  //   NULL,      // Task input parameter
+  //   0,         // Priority of the task
+  //   &Task1,      // Task handle.
+  //   0          // Core where the task should run
+  // );
 }
 
 void loop() {
-
   // disconnecting
   if (!deviceConnected && oldDeviceConnected) {
     Serial.println("Device disconnected.");

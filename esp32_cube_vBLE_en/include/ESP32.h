@@ -1,29 +1,14 @@
 #pragma once
 #include <Arduino.h>
-
+#define FIRMWARE_VERSION 1.0
 #define BUZZER      27
 #define VBAT        34
 #define INT_LED     39
 
 #define BRAKE       26
 
-#define DIR1        4
-#define ENC1_1      35
-#define ENC1_2      33
-#define PWM1        32
-#define PWM1_CH     1
 
-#define DIR2        15
-#define ENC2_1      13
-#define ENC2_2      14
-#define PWM2        25
-#define PWM2_CH     0
 
-#define DIR3        5
-#define ENC3_1      16
-#define ENC3_2      17
-#define PWM3        18
-#define PWM3_CH     2
 
 #define TIMER_BIT   8
 #define BASE_FREQ   20000
@@ -41,6 +26,8 @@
 
 #define LED_PIN       23    // Pin that connects to WS2812B
 #define NUM_PIXELS    3      // The number of LEDs (pixels) on WS2812B
+
+extern int motors[3][5];
 
 extern float K1 ; 
 extern float K2;
@@ -72,6 +59,7 @@ struct OffsetsObj {
   byte Red;   byte Green; byte Blue;
   byte vertexRed; byte vertexGreen; byte vertexBlue;
   byte edgeRed; byte edgeGreen; byte edgeBlue;
+  int motor1; int motor2; int motor3;
 };
 extern OffsetsObj offsets;
 
@@ -151,3 +139,21 @@ extern bool ConnectBT;
 extern word DelayBT;
 
 extern char RGB_Color[18][3];
+
+extern int DIR1;
+extern int ENC1_1;
+extern int ENC1_2;
+extern int PWM1;
+extern int PWM1_CH;
+
+extern int DIR2;
+extern int ENC2_1;
+extern int ENC2_2;
+extern int PWM2;
+extern int PWM2_CH;
+
+extern int DIR3;
+extern int ENC3_1;
+extern int ENC3_2;
+extern int PWM3;
+extern int PWM3_CH;

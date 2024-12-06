@@ -98,7 +98,7 @@ body {
                     <div class="col text-center"><button id="disconnectBleButton" class="disconnectButton btn btn-primary" disabled> Disconnect Cube</button></div>
                 </div>
                 <div class="row m-3 hidden justify-content-center">
-                    <div class='col-6 text-center' id="bleState" style="color:#d13a30;">Disconnected</div>
+                    <div class='col-10 text-center' id="bleState" style="color:#d13a30;"><div id="con">Disconnected</div><br/><div id="firmware_version"></div></div>
                 </div>
                 <div class="row m-2 collapse" id="battery_voltage">
                     <div class="col">
@@ -117,7 +117,43 @@ body {
         <div class="row shadow-lg disconnected mb-3">
             <div class="col">
                 <div class="row mt-4">
-                    <div class="col h3 text-center mb-3">Tests</div>
+                    <div class="col h3 text-center mb-3">Motors</div>
+                </div>
+                <div class="row justify-content-center mb-5">
+                    <div class="col-12 text-center p-0 m-0">
+                        Setup
+                    </div>
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-4">
+                                Motor 1:
+                                <select id="motor1_config" motor="0" class="form-select form-select-lg mb-3 motor_config_select" aria-label="Default select">
+                                    <option value="0" selected>X</option>
+                                    <option value="1">Y</option>
+                                    <option value="2">Z</option>
+                                </select>
+                            </div>
+                            <div class="col-4">
+                                Motor 2:
+                                <select id="motor2_config" motor="1" class="form-select form-select-lg motor_config_select" aria-label="Default select">
+                                    <option value="0">X</option>
+                                    <option value="1" selected>Y</option>
+                                    <option value="2">Z</option>
+                                </select>
+                            </div>
+                            <div class="col-4">
+                                Motor 3:
+                                <select id="motor3_config" motor="2" class="form-select form-select-lg motor_config_select" aria-label="Default select">
+                                    <option value="0">X</option>
+                                    <option value="1">Y</option>
+                                    <option value="2" selected>Z</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12 text-center p-0 m-0">
+                            <button id="saveMotorsButton" class="btn-info btn p-3">Save Motor Setup</button>
+                        </div>    
+                    </div>
                 </div>
                 <div class="row justify-content-center mb-5">
                     <div class="col-4 text-center p-0 m-0">
@@ -338,17 +374,21 @@ body {
 
 </body>
 <script>
+    const latest_firmware_version = 1.00;
     // DOM Elements
     var w = 0;
     var width = 0;
+    var motor_settings = [0,1,2];
     const connectButton = document.getElementById('connectBleButton');
+    const saveMotorsButton = document.getElementById('saveMotorsButton');
     const disconnectButton = document.getElementById('disconnectBleButton');
     const testMotorsButton = document.getElementById('testMotorsButton');
     const calibrateVertexButton = document.getElementById('calibrateVertexButton');
     const calibrateEdgeButton = document.getElementById('calibrateEdgeButton');
     const retrievedValue = document.getElementById('valueContainer');
     const latestValueSent = document.getElementById('valueSent');
-    const bleStateContainer = document.getElementById('bleState');
+    const bleStateContainer = document.getElementById('con');
+    const firmwareContainer = document.getElementById('firmware_version');
     
 
     const motor_1_msg = document.getElementById('motor_1_msg');
@@ -416,6 +456,7 @@ body {
 
     save_vertex.addEventListener('click', () => writeOnCharacteristic("6v"));
     save_edge.addEventListener('click', () => writeOnCharacteristic("6e"));
+    saveMotorsButton.addEventListener('click', () => writeOnCharacteristic("8" + $('#motor1_config').val() + $('#motor2_config').val() + $('#motor3_config').val()));
 
     //Define BLE Device Specs
     var deviceName ='Balance Cube';
@@ -453,6 +494,27 @@ body {
         $('#motor_3_progress_holder').collapse('show');
 
     } );
+
+
+
+    $(".motor_config_select").on('change', function(e){
+        var motorFrom = $(e.target).attr("motor");
+        var newVal = $(e.target).val();
+        var oldVal = motor_settings[ motorFrom ];
+        $(e.target).val(oldVal);
+        var toElement = $(".motor_config_select option:selected[value='" + newVal + "']").parent(); 
+        var motorTo = $(toElement).attr("motor");
+        var fromElement = $(e.target);
+        fromElement.attr("motor", newVal);
+        toElement.attr("motor", oldVal);
+        console.log(newVal);
+        console.log(oldVal);
+        fromElement.val(newVal);
+        toElement.val(oldVal);
+        console.log(motorTo);
+        console.log(motorFrom);
+
+    });
 
     calibrateVertexButton.addEventListener('click', () => writeOnCharacteristic(2))
     calibrateEdgeButton.addEventListener('click', () => writeOnCharacteristic(3))
@@ -507,6 +569,7 @@ body {
             $('#connectBleButton').attr('disabled', true);
             $(".disconnected").addClass('connected');
             $("#battery_voltage").collapse('show');
+            $('#firmware_version').collapse('show');
             setTimeout(function(){writeOnCharacteristic(4);}, 1000);
             return characteristic.readValue();
         })
@@ -562,6 +625,23 @@ body {
                         $('#balancing_type').html("");
                         $('#balancing').collapse('hide');
                         break;
+                    case 'fv':
+                        if(parseFloat(matches[2]) < latest_firmware_version) {
+                            $('.modal-body').html("The cube you connected to is running an old firmware (" + matches[2] + "). Update to the latest version(" + latest_firmware_version +")");
+                            $('#message_model').modal({
+                                keyboard: false
+                            });                           
+                        }
+                        $('#firmware_version').html('(Firmware version: ' + matches[2] + ')');
+                        break;
+                    case 'sm':
+                        motor_settings = /(.*)\|(.*)\|(.*)/.exec(matches[2]);
+                        motor_settings = [motor_settings[1],motor_settings[2],motor_settings[3]]
+                        console.log(motor_settings);
+                        $("#motor1_config").val(motor_settings[0]);
+                        $("#motor2_config").val(motor_settings[1]);
+                        $("#motor3_config").val(motor_settings[2]);
+                        break;
                     default:
                         break;
                 }
@@ -576,6 +656,7 @@ body {
         console.log('Device Disconnected:', event.target.device.name);
         bleStateContainer.innerHTML = "Device disconnected";
         bleStateContainer.style.color = "#d13a30";
+        $('#firmware_version').collapse('hide');
         $(".disconnected").removeClass('connected');
         $('#disconnectBleButton').attr('disabled', true);
         $('#connectBleButton').removeAttr('disabled');
@@ -593,7 +674,7 @@ body {
     function handleCharacteristicChange(event){
         const newValueReceived = new TextDecoder().decode(event.target.value);
             matches = /\*(.*)\*(.*)/.exec(newValueReceived);
-            console.log(matches);
+            // console.log(matches);
             if(matches){
                 switch(matches[1]) {
                     case 'm1':
@@ -768,6 +849,24 @@ body {
                         width = (9/(matches[2] - 7))  * 100;
                         $("#battery_progress").html("Battery: " + matches[2] + "V");
                         $('#battery_progress').css("width", width + "%");
+                        break;                    
+                    case 'fv':
+                        if(parseFloat(matches[2]) < latest_firmware_version) {
+                            $('.modal-body').html("The cube you connected to is running an old firmware (" + matches[2] + "). Update to the latest version(" + latest_firmware_version +")");
+                            $('#message_model').modal({
+                                keyboard: false
+                            });                           
+                        }
+                        $('#firmware_version').html('(Firmware version: ' + matches[2] + ')');
+                        break;
+                    case 'sm':
+                        motor_settings = /(.*)\|(.*)\|(.*)/.exec(matches[2]);
+                        motor_settings = [motor_settings[1],motor_settings[2],motor_settings[3]];
+                        console.log(motor_settings);
+
+                        $("#motor1_config").val(motor_settings[0]);
+                        $("#motor2_config").val(motor_settings[1]);
+                        $("#motor3_config").val(motor_settings[2]);
                         break;
                     default:
                         break;

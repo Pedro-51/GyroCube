@@ -1,6 +1,7 @@
 
 #pragma once
 #include "ESP32.h"
+#include "pitches.h"
 #include <FastLED.h>
 #include "BluetoothSerial.h"
 
@@ -29,6 +30,9 @@ extern BLECharacteristic* pSensorCharacteristic;
 extern BLECharacteristic* pLedCharacteristic; 
 extern BluetoothSerial SerialBT;
 extern CRGB leds[NUM_PIXELS];
+extern bool play;
+
+
 extern long lasttime;
 extern bool deviceConnected;
 extern bool oldDeviceConnected;
@@ -59,3 +63,5 @@ extern void saveSettings(char t);
 extern void balancing(String type);
 extern void notBalancing(); 
 extern void setLeds(char t, int r, int g, int b);
+extern void musicLoop(void* pvParameters);
+extern void saveMotors(int m1, int m2, int m3);

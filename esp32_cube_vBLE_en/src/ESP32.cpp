@@ -13,6 +13,12 @@ bool vertex_calibrated = false;
 bool calibrated = false;
 bool calibrated_leds = false;
 
+int motors[3][5] = {
+  4,35,33,32,1,
+  15,13,14,25,0, 
+  5,16,17,18,2
+};
+
 byte loop_time = 15;
 
 float alpha = 0.7;
