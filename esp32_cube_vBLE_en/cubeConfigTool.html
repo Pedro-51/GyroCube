@@ -509,12 +509,8 @@ body {
         var fromElement = $(e.target);
         fromElement.attr("motor", newVal);
         toElement.attr("motor", oldVal);
-        console.log(newVal);
-        console.log(oldVal);
         fromElement.val(newVal);
         toElement.val(oldVal);
-        console.log(motorTo);
-        console.log(motorFrom);
 
     });
 
@@ -639,10 +635,14 @@ body {
                     case 'sm':
                         motor_settings = /(.*)\|(.*)\|(.*)/.exec(matches[2]);
                         motor_settings = [motor_settings[1],motor_settings[2],motor_settings[3]]
-                        console.log(motor_settings);
                         $("#motor1_config").val(motor_settings[0]);
                         $("#motor2_config").val(motor_settings[1]);
                         $("#motor3_config").val(motor_settings[2]);
+                        break;
+                    case 'sl':
+                        led_settings = /(\d*)\|(\d*)\|(\d*)\|(\d*)\|(\d*)\|(\d*)/.exec(matches[2]);
+                        $("#rgbColorV").val(rgbToHex(led_settings[1],led_settings[2],led_settings[3]));
+                        $("#rgbColorE").val(rgbToHex(led_settings[4],led_settings[5],led_settings[6]));
                         break;
                     default:
                         break;
@@ -652,6 +652,14 @@ body {
         .catch(error => {
             console.log('Error: ', error);
         })
+    }
+
+    function componentToHex(c) {
+            let hex = parseInt(c).toString(16);
+            return hex.length === 1 ? "0" + hex : hex;
+    }
+    function rgbToHex(r, g, b) {
+        return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
     }
 
     function onDisconnected(event){
@@ -676,7 +684,7 @@ body {
     function handleCharacteristicChange(event){
         const newValueReceived = new TextDecoder().decode(event.target.value);
             matches = /\*(.*)\*(.*)/.exec(newValueReceived);
-            // console.log(matches);
+             console.log(matches);
             if(matches){
                 switch(matches[1]) {
                     case 'm1':
@@ -864,13 +872,16 @@ body {
                     case 'sm':
                         motor_settings = /(.*)\|(.*)\|(.*)/.exec(matches[2]);
                         motor_settings = [motor_settings[1],motor_settings[2],motor_settings[3]];
-                        console.log(motor_settings);
-
                         $("#motor1_config").val(motor_settings[0]);
                         $("#motor2_config").val(motor_settings[1]);
                         $("#motor3_config").val(motor_settings[2]);
                         break;
-                    default:
+                    case 'sl':
+                       led_settings = /(\d*)\|(\d*)\|(\d*)\|(\d*)\|(\d*)\|(\d*)/.exec(matches[2]);
+                        $("#rgbColorV").val(rgbToHex(led_settings[1],led_settings[2],led_settings[3]));
+                        $("#rgbColorE").val(rgbToHex(led_settings[4],led_settings[5],led_settings[6]));
+                        break;
+                     default:
                         break;
                 }
             }
