@@ -514,8 +514,8 @@ void loop() {
       Serial.println("first you need to calibrate the balancing points...");
       SerialBT.println("95");
 
-      pSensorCharacteristic->setValue("*a*First you need to calibrate the balancing points...");
-      pSensorCharacteristic->notify();
+      //pSensorCharacteristic->setValue("*a*First you need to calibrate the balancing points...");
+      //pSensorCharacteristic->notify();
       if (!calibrated_leds) {
         colorLed(0, 50, 0, 1, 3, 0); 
         calibrated_leds = true; 

@@ -376,7 +376,7 @@ body {
 
 </body>
 <script>
-    const latest_firmware_version = 1.00;
+    const latest_firmware_version = 1.11;
     // DOM Elements
     var w = 0;
     var width = 0;
@@ -684,29 +684,20 @@ body {
     function handleCharacteristicChange(event){
         const newValueReceived = new TextDecoder().decode(event.target.value);
             matches = /\*(.*)\*(.*)/.exec(newValueReceived);
-             console.log(matches);
             if(matches){
                 switch(matches[1]) {
                     case 'm1':
                         motor_1_msg.innerHTML = matches[2];   
                         motor_1_card.classList.remove('success');
                         motor_1_card.classList.remove('failure');
+                        width = getElementWidthPercentage('#motor_1_progress');
                         if(matches[2] == 'Stop'){                    
-                            w = $('#motor_1_progress').css("width");
-                            w = w.replace("px", "");
-                            w = w.replace("%", "");
-                            w = parseInt(w);
-                            if(w==0){
-                                width = 0;
-                            }
-                            
-                            for(var i=0; i< 33; i++){
+                            for(i=0; i< 33; i++){
                                 width += 1;
                                 $('#motor_1_progress').css("width", width + "%");
                             }
                         }
-                        if(sre.test(matches[2])){
-                            
+                        if(sre.test(matches[2])){                            
                             for(var i=0; i< 34; i++){
                                 width += 1;
                                 $('#motor_1_progress').css("width", width + "%");
@@ -722,7 +713,6 @@ body {
                                 $('#motor_1_progress').css("width", width + "%");
                             }
                             setTimeout(function(){$('#motor_1_progress_holder').collapse('hide');}, 2000);
-                            width= 0;
                             motor_1_card.classList.remove('bg-success');
                             motor_1_card.classList.add('bg-danger');
                             motors_working = false;
@@ -733,13 +723,8 @@ body {
                         motor_2_msg.innerHTML = matches[2];   
                         motor_2_card.classList.remove('success');
                         motor_2_card.classList.remove('failure');           
-                        w = $('#motor_2_progress').css("width");
-                        w = w.replace("px", "");
-                        w = w.replace("%", "");
-                        w = parseInt(w);
-                        if(w==0){
-                            width = 0;
-                        }
+                        width = getElementWidthPercentage('#motor_2_progress');
+                            
                         if(matches[2] == 'Stop'){
                             for(var i=0; i< 33; i++){
                                 width += 1;
@@ -754,7 +739,6 @@ body {
                             setTimeout(function(){$('#motor_2_progress_holder').collapse('hide');}, 2000);
                             motor_2_card.classList.add('bg-success');
                             motor_2_card.classList.remove('bg-danger');
-                            width = 0;
                         }
                         if(fre.test(matches[2])){
                             for(var i=0; i< 34; i++){
@@ -764,7 +748,6 @@ body {
                             setTimeout(function(){$('#motor_2_progress_holder').collapse('hide');}, 2000);
                             motor_2_card.classList.remove('bg-success');
                             motor_2_card.classList.add('bg-danger');
-                            width = 0;
                             motors_working = false;
                         }
 
@@ -773,13 +756,8 @@ body {
                         motor_3_card.classList.remove('success');
                         motor_3_card.classList.remove('failure');
                         motor_3_msg.innerHTML = matches[2];   
-                        w = $('#motor_3_progress').css("width");
-                        w = w.replace("px", "");
-                        w = w.replace("%", "");
-                        w = parseInt(w);
-                        if(w==0){
-                            width = 0;
-                        }
+                        width = getElementWidthPercentage('#motor_3_progress');
+                            
                         if(matches[2] == 'Stop'){
                             for(var i=0; i< 33; i++){
                                 width += 1;
@@ -793,7 +771,6 @@ body {
                             }
                             motor_3_card.classList.add('bg-success');
                             motor_2_card.classList.remove('bg-danger');
-                            width = 0;
                             setTimeout(function(){$('#motor_3_progress_holder').collapse('hide');}, 2000)
 
                             if(motors_working){
@@ -817,7 +794,6 @@ body {
                             setTimeout(function(){$('#motor_3_progress_holder').collapse('hide');}, 2000)
                             motor_3_card.classList.remove('bg-success');
                             motor_3_card.classList.add('bg-danger');
-                            width = 0;
                             $('.modal-body').html("Some motor tests failed. check wiring.");
                             $('#message_model').modal({
                                 keyboard: false
@@ -964,7 +940,12 @@ body {
         return datetime;
     }
 
+    function getElementWidthPercentage(element) {
+        var elementWidth = $(element).width(); // Get the element's width in pixels
+        var parentWidth = $(element).parent().width(); // Get the parent's width in pixels
 
+        return (elementWidth / parentWidth) * 100; // Calculate the percentage
+    }
 </script>
 
 </html>

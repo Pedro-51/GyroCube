@@ -435,6 +435,10 @@ void getSettings() {
   sprintf(str, "*sm*%d|%d|%d", offsets.motor1, offsets.motor2, offsets.motor3);
   pSensorCharacteristic->setValue(str);
   pSensorCharacteristic->notify();
+
+  sprintf(str, "*sl*%d|%d|%d|%d|%d|%d", offsets.vertexRed, offsets.vertexGreen, offsets.vertexBlue, offsets.edgeRed, offsets.edgeGreen, offsets.edgeBlue);
+  pSensorCharacteristic->setValue(str);
+  pSensorCharacteristic->notify();
 }
 
 void setSettings(char s, char c) {
