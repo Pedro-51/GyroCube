@@ -1,0 +1,951 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Balance Cube Config tool</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <style>
+        html {
+    font-family: Arial, Helvetica, sans-serif;
+    display: inline-block;
+    text-align: center;
+}
+h1 {
+    font-size: 1.8rem;
+    color: white;
+}
+.topnav {
+    text-align: center;
+    overflow: hidden;
+    background-color: #0A1128;
+    color: white;
+}
+body {
+    margin: 0;
+}
+.disconnected{
+    opacity: .3;
+}
+.connected{
+    opacity: 1;
+}
+
+.loader{
+        display: block;
+        position: relative;
+        height: 32px;
+        width: 120px;
+        border-bottom: 5px solid #fff;
+        box-sizing: border-box;
+        animation: balancing 2s linear infinite alternate;
+        transform-origin: 50% 100%;
+      }
+      .loader:before{
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: #00ff0b;
+        animation: ballbns 2s linear infinite alternate;
+      }
+      .loader:after{
+        content: '';
+        position: absolute;
+        left: 50%;
+        bottom: 0;
+        height: 20px;
+        width: 20px;
+        transform: translate(-50%, 100%);
+        border-radius: 50%;
+        border: 6px solid #00ff0b;
+      }
+      @keyframes ballbns {
+        0% {  left: 0; transform: translateX(0%); }
+        100% {  left: 100%; transform: translateX(-100%); }
+      }
+      @keyframes balancing {
+        0% {  transform: rotate(-15deg); }
+        50% {  transform: rotate(0deg); }
+        100% {  transform: rotate(15deg); }
+      }
+
+
+</style>
+</head>
+<body>
+    <div class="topnav">
+        <h1>Balancing Cube Config Tool</h1>
+    </div>
+    <div class="container">
+        <div class="row m-3 shadow-lg mb-5">
+            <div class="col">
+                <div class="row mt-4">
+                    <div class="col text-center"><button id="connectBleButton" class="connectButton btn btn-primary mt-3"> Connect to Cube</button></div>
+                    <div class="col text-center"><button id="disconnectBleButton" class="disconnectButton btn btn-primary mt-3" disabled> Disconnect Cube</button></div>
+                </div>
+                <div class="row m-3 hidden justify-content-center">
+                    <div class='col-10 text-center' id="bleState" style="color:#d13a30;"><div id="con">Disconnected</div><br/><div id="firmware_version"></div></div>
+                </div>
+                <div class="row m-2 collapse" id="battery_voltage">
+                    <div class="col">
+                        <div id="batter_progress_holder" class="">
+                            <div class="progress">
+                                <div id="battery_progress" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row shadow-lg mb-3 h2 text-center py-5 collapse" id="balancing" style="background:lightslategray; color:rgb(45, 236, 42)">
+            <div class="py-3 col-12">Balancing: <span id="balancing_type"></span></div><div class="py-3 col-12 text-center"><center><span class="loader"></span></center></div>
+        </div>
+        <div class="row shadow-lg disconnected mb-3">
+            <div class="col">
+                <div class="row justify-content-center mb-5">
+                    <div class="col-12 h4 text-center p-0 m-4">
+                        <div class="row">
+                            <div class="col-12 mb-3">Motor Layout</div>
+                            <div class="col-12"><img src="https://idoxa55.sufydely.com/motors_layout.png"></div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-4 text-center">
+                                Motor 1:
+                                <select id="motor1_config" motor="0" class="form-select form-select-lg mb-3 motor_config_select" aria-label="Default select">
+                                    <option value="0" selected>X</option>
+                                    <option value="1">Y</option>
+                                    <option value="2">Z</option>
+                                </select>
+                            </div>
+                            <div class="col-4 text-center">
+                                Motor 2:
+                                <select id="motor2_config" motor="1" class="form-select form-select-lg motor_config_select" aria-label="Default select">
+                                    <option value="0">X</option>
+                                    <option value="1" selected>Y</option>
+                                    <option value="2">Z</option>
+                                </select>
+                            </div>
+                            <div class="col-4 text-center">
+                                Motor 3:
+                                <select id="motor3_config" motor="2" class="form-select form-select-lg motor_config_select" aria-label="Default select">
+                                    <option value="0">X</option>
+                                    <option value="1">Y</option>
+                                    <option value="2" selected>Z</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12 text-center p-0 m-0">
+                            <button id="saveMotorsButton" class="btn-info btn p-3">Save Motor Setup</button>
+                        </div>    
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        <div class="row shadow-lg disconnected mb-3">
+            <div class="col">
+                <div class="row">
+                    <div class="col h3 text-center mt-4">Motor Testing</div>
+                </div>
+                <div class="row justify-content-center mb-3">
+                    <div class="col-4 shadow text-center m-2 py-4" id="motor_1_card" >
+                        <div class="row">
+                            <div class="col"><h2>Motor 1</h2></div>
+                        </div>
+                        <div class="row text-center">
+                            <div class="col" id="motor_1_msg"></div>
+                        
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div id="motor_1_progress_holder" class="collapse"><div class="progress"><div id="motor_1_progress" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%"></div></div></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 shadow text-center m-2 py-4" id="motor_2_card" >
+                        <div class="row">
+                            <div class="col"><h2>Motor 2</h2></div>
+                        </div>
+                        <div class="row">
+                            <div class="col" id="motor_2_msg"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div id="motor_2_progress_holder" class="collapse"><div class="progress"><div id="motor_2_progress" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%"></div></div></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 shadow text-center m-2 py-4" id="motor_3_card" >
+                        <div class="row">
+                            <div class="col"><h2>Motor 3</h2></div>
+                        </div>
+                        <div class="row">
+                            <div class="col" id="motor_3_msg"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div id="motor_3_progress_holder" class="collapse"><div class="progress"><div id="motor_3_progress" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%"></div></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-center mb-4">
+                    <div class="col-4 text-center p-0 m-0">
+                        <button id="testMotorsButton" class="btn btn-warning px-3 py-3">Test Motors</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row shadow-lg disconnected mb-3">
+            <div class="col text-center justify-content-center">
+                <div class="row my-3"><div class="col"><h2>Calibration</h2></div></div>
+                <div class="row mb-3">
+                    <div class="col"><button id="calibrateVertexButton" class="btn btn-warning px-5 py-3">Vertex</button></div>
+                    <div class="col"><button id="calibrateEdgeButton" class="btn btn-warning px-5 py-3">Edge</button></div>
+                </div>
+            </div>
+        </div>
+        <div class="row shadow-lg mb-3 disconnected">
+            <div class="col text-center justify-content-center">
+                <div class="row my-3"><div class="col"><h2>Settings</h2></div></div>
+                <div class="row mb-3 justify-content-between">
+                    <div class="col-md-5 col-sm-12">                
+                        <div class="row my-3"><div class="col"><h3>Vertex</h3></div></div>
+                        <div class="row my-2">
+                            <div class="col text-center align-middle"><h4>K1</h4></div>
+                            <div class="col align-middle" id="k1"></div>
+                            <div class="col" >
+                                <div class="row m-0">
+                                    <div class="col m-0 p-0"><button class="btn btn-secondary" id="k1p">+</button></div>
+                                    <div class="col m-0 p-0"><button class="btn btn-secondary" id="k1m">-</button></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row my-2">
+                            <div class="col text-center align-middle"><h4>K2</h4></div>
+                            <div class="col align-middle" id="k2"></div>
+                            <div class="col" >
+                                <div class="row m-0">
+                                    <div class="col m-0 p-0"><button class="btn btn-secondary" id="k2p">+</button></div>
+                                    <div class="col m-0 p-0"><button class="btn btn-secondary" id="k2m">-</button></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row my-2">
+                            <div class="col text-center align-middle"><h4>K3</h4></div>
+                            <div class="col align-middle" id="k3"></div>
+                            <div class="col" >
+                                <div class="row m-0">
+                                    <div class="col m-0 p-0"><button class="btn btn-secondary" id="k3p">+</button></div>
+                                    <div class="col m-0 p-0"><button class="btn btn-secondary" id="k3m">-</button></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row my-2">
+                            <div class="col text-center align-middle"><h4>K4</h4></div>
+                            <div class="col align-middle" id="k4"></div>
+                            <div class="col" >
+                                <div class="row m-0">
+                                    <div class="col m-0 p-0"><button class="btn btn-secondary" id="k4p">+</button></div>
+                                    <div class="col m-0 p-0"><button class="btn btn-secondary" id="k4m">-</button></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row my-2">
+                            <div class="col text-center align-middle"><h4>ZK2</h4></div>
+                            <div class="col align-middle" id="zk2"></div>
+                            <div class="col" >
+                                <div class="row m-0">
+                                    <div class="col m-0 p-0"><button class="btn btn-secondary" id="zk2p">+</button></div>
+                                    <div class="col m-0 p-0"><button class="btn btn-secondary" id="zk2m">-</button></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row my-2">
+                            <div class="col text-center align-middle"><h4>ZK3</h4></div>
+                            <div class="col align-middle" id="zk3"></div>
+                            <div class="col" >
+                                <div class="row m-0">
+                                    <div class="col m-0 p-0"><button class="btn btn-secondary" id="zk3p">+</button></div>
+                                    <div class="col m-0 p-0"><button class="btn btn-secondary" id="zk3m">-</button></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row my-2">
+                            <div class="col"><button class="btn btn-warning" id="save_vertex">SAVE VERTEX</button></div>
+                        </div>
+                    </div>
+                    <div class="col-md-5 col-sm-12">
+                        <div class="row my-3"><div class="col"><h3>Edge</h3></div></div>
+                        <div class="row my-2">
+                            <div class="col text-center align-middle"><h4>eK1</h4></div>
+                            <div class="col align-middle" id="ek1"></div>
+                            <div class="col" >
+                                <div class="row m-0">
+                                    <div class="col m-0 p-0"><button class="btn btn-secondary" id="ek1p">+</button></div>
+                                    <div class="col m-0 p-0"><button class="btn btn-secondary" id="ek1m">-</button></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row my-2">
+                            <div class="col text-center align-middle"><h4>eK2</h4></div>
+                            <div class="col align-middle" id="ek2"></div>
+                            <div class="col" >
+                                <div class="row m-0">
+                                    <div class="col m-0 p-0"><button class="btn btn-secondary" id="ek2p">+</button></div>
+                                    <div class="col m-0 p-0"><button class="btn btn-secondary" id="ek2m">-</button></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row my-2">
+                            <div class="col text-center align-middle"><h4>eK3</h4></div>
+                            <div class="col align-middle" id="ek3"></div>
+                            <div class="col" >
+                                <div class="row m-0">
+                                    <div class="col m-0 p-0"><button class="btn btn-secondary" id="ek3p">+</button></div>
+                                    <div class="col m-0 p-0"><button class="btn btn-secondary" id="ek3m">-</button></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row my-2">
+                            <div class="col text-center align-middle"><h4>eK4</h4></div>
+                            <div class="col align-middle" id="ek4"></div>
+                            <div class="col" >
+                                <div class="row m-0">
+                                    <div class="col m-0 p-0"><button class="btn btn-secondary" id="ek4p">+</button></div>
+                                    <div class="col m-0 p-0"><button class="btn btn-secondary" id="ek4m">-</button></div>
+                                </div>
+                            </div>
+                        </div>   
+                        <div class="row my-2">
+                            <div class="col"><button class="btn btn-warning" id="save_edge">SAVE EDGE</button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row shadow-lg mb-3 disconnected">
+            <div class="col text-center justify-content-center">
+                <div class="row my-3"><div class="col"><h2>LEDs</h2></div></div>
+                <div class="row mb-3 justify-content-between">
+                    <div class="col-md-5 col-sm-6">                
+                        <label for="rgbColorE" class="form-label">Edge Led color</label>
+                        <input type="color" class="form-control form-control-color" id="rgbColorE" value="#000000" title="Choose your Edge color">
+                    </div>
+                    <div class="col-md-5 col-sm-6">
+                        <label for="rgbColorV" class="form-label">Vertex Led color</label>
+                        <input type="color" class="form-control form-control-color" id="rgbColorV" value="#000000" title="Choose your Vertex color">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>    
+
+
+
+
+<!-- Button trigger modal -->
+
+  <!-- Modal -->
+  <div class="modal fade" id="message_model" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-body">
+          
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+
+</body>
+<script>
+    const latest_firmware_version = 1.11;
+    // DOM Elements
+    var w = 0;
+    var width = 0;
+    var motor_settings = [0,1,2];
+    const connectButton = document.getElementById('connectBleButton');
+    const saveMotorsButton = document.getElementById('saveMotorsButton');
+    const disconnectButton = document.getElementById('disconnectBleButton');
+    const testMotorsButton = document.getElementById('testMotorsButton');
+    const calibrateVertexButton = document.getElementById('calibrateVertexButton');
+    const calibrateEdgeButton = document.getElementById('calibrateEdgeButton');
+    const retrievedValue = document.getElementById('valueContainer');
+    const latestValueSent = document.getElementById('valueSent');
+    const bleStateContainer = document.getElementById('con');
+    const firmwareContainer = document.getElementById('firmware_version');
+    
+
+    const motor_1_msg = document.getElementById('motor_1_msg');
+    const motor_2_msg = document.getElementById('motor_2_msg');
+    const motor_3_msg = document.getElementById('motor_3_msg');
+    
+    const motor_1_card = document.getElementById('motor_1_card');
+    const motor_2_card = document.getElementById('motor_2_card');
+    const motor_3_card = document.getElementById('motor_3_card');
+    
+
+    const k1p = document.getElementById('k1p');
+    const k2p = document.getElementById('k2p');
+    const k3p = document.getElementById('k3p');
+    const k4p = document.getElementById('k4p');
+    const zk2p = document.getElementById('zk2p');
+    const zk3p = document.getElementById('zk3p');
+
+    const k1m = document.getElementById('k1m');
+    const k2m = document.getElementById('k2m');
+    const k3m = document.getElementById('k3m');
+    const k4m = document.getElementById('k4m');
+    const zk2m = document.getElementById('zk2m');
+    const zk3m = document.getElementById('zk3m');
+
+    const ek1p = document.getElementById('ek1p');
+    const ek2p = document.getElementById('ek2p');
+    const ek3p = document.getElementById('ek3p');
+    const ek4p = document.getElementById('ek4p');
+
+    const ek1m = document.getElementById('ek1m');
+    const ek2m = document.getElementById('ek2m');
+    const ek3m = document.getElementById('ek3m');
+    const ek4m = document.getElementById('ek4m');
+
+    const save_vertex = document.getElementById('save_vertex');
+    const save_edge = document.getElementById('save_edge');
+    const rgbColor = document.getElementById('rgbColor');
+    $(function(){
+        $('#rgbColorE').on('change', function(e){color = $('#rgbColorE').val(); writeOnCharacteristic("7e" + color.replace("#",""))});
+        $('#rgbColorV').on('change', function(e){color = $('#rgbColorV').val(); writeOnCharacteristic("7v" + color.replace("#",""))});
+    });
+
+    k1p.addEventListener('click', () => writeOnCharacteristic("51+"));
+    k1m.addEventListener('click', () => writeOnCharacteristic("51-"));
+    k2p.addEventListener('click', () => writeOnCharacteristic("52+"));
+    k2m.addEventListener('click', () => writeOnCharacteristic("52-"));
+    k3p.addEventListener('click', () => writeOnCharacteristic("53+"));
+    k3m.addEventListener('click', () => writeOnCharacteristic("53-"));
+    k4p.addEventListener('click', () => writeOnCharacteristic("54+"));
+    k4m.addEventListener('click', () => writeOnCharacteristic("54-"));
+    zk2p.addEventListener('click', () => writeOnCharacteristic("55+"));
+    zk2m.addEventListener('click', () => writeOnCharacteristic("55-"));
+    zk3p.addEventListener('click', () => writeOnCharacteristic("56+"));
+    zk3m.addEventListener('click', () => writeOnCharacteristic("56-"));
+    ek1p.addEventListener('click', () => writeOnCharacteristic("57+"));
+    ek1m.addEventListener('click', () => writeOnCharacteristic("57-"));
+    ek2p.addEventListener('click', () => writeOnCharacteristic("58+"));
+    ek2m.addEventListener('click', () => writeOnCharacteristic("58-"));
+    ek3p.addEventListener('click', () => writeOnCharacteristic("59+"));
+    ek3m.addEventListener('click', () => writeOnCharacteristic("59-"));
+    ek4p.addEventListener('click', () => writeOnCharacteristic("50+"));
+    ek4m.addEventListener('click', () => writeOnCharacteristic("50-"));
+
+
+    save_vertex.addEventListener('click', () => writeOnCharacteristic("6v"));
+    save_edge.addEventListener('click', () => writeOnCharacteristic("6e"));
+    saveMotorsButton.addEventListener('click', () => writeOnCharacteristic("8" + $('#motor1_config').val() + $('#motor2_config').val() + $('#motor3_config').val()));
+
+    //Define BLE Device Specs
+    var deviceName ='Balance Cube';
+    var bleService = '19b10000-e8f2-537e-4f6c-d104768a1214';
+    var testMotorCharacteristic = '19b10002-e8f2-537e-4f6c-d104768a1214';
+    var sensorCharacteristic= '19b10001-e8f2-537e-4f6c-d104768a1214';
+
+    //Global Variables to Handle Bluetooth
+    var bleServer;
+    var bleServiceFound;
+    var sensorCharacteristicFound;
+    const sre = new RegExp('Speed', 'i');
+    const fre = new RegExp('Fail', 'i');
+    var motors_working = true;
+    // Connect Button (search for BLE Devices only if BLE is available)
+    connectButton.addEventListener('click', (event) => {
+        if (isWebBluetoothEnabled()){
+            connectToDevice();
+        }
+    });
+
+    // Disconnect Button
+    disconnectButton.addEventListener('click', disconnectDevice);
+
+    // Write to the ESP32 LED Characteristic
+    testMotorsButton.addEventListener('click', function(){
+        writeOnCharacteristic(1);
+        width=0;
+        motors_working = true;
+        $('#motor_1_progress').width(0);
+        $('#motor_2_progress').width(0);
+        $('#motor_3_progress').width(0);
+        $('#motor_1_progress_holder').collapse('show');
+        $('#motor_2_progress_holder').collapse('show');
+        $('#motor_3_progress_holder').collapse('show');
+
+    } );
+
+
+
+    $(".motor_config_select").on('change', function(e){
+        var motorFrom = $(e.target).attr("motor");
+        var newVal = $(e.target).val();
+        var oldVal = motor_settings[ motorFrom ];
+        $(e.target).val(oldVal);
+        var toElement = $(".motor_config_select option:selected[value='" + newVal + "']").parent(); 
+        var motorTo = $(toElement).attr("motor");
+        var fromElement = $(e.target);
+        fromElement.attr("motor", newVal);
+        toElement.attr("motor", oldVal);
+        fromElement.val(newVal);
+        toElement.val(oldVal);
+
+    });
+
+    calibrateVertexButton.addEventListener('click', () => writeOnCharacteristic(2))
+    calibrateEdgeButton.addEventListener('click', () => writeOnCharacteristic(3))
+    // Check if BLE is available in your Browser
+    function isWebBluetoothEnabled() {
+        if (!navigator.bluetooth) {
+            console.log('Web Bluetooth API is not available in this browser!');
+            bleStateContainer.innerHTML = "Web Bluetooth API is not available in this browser/device!";
+            return false
+        }
+        console.log('Web Bluetooth API supported in this browser.');
+        return true
+    }
+
+    // Connect to BLE Device and Enable Notifications
+    function connectToDevice(){
+        console.log('Initializing Bluetooth');
+        navigator.bluetooth.requestDevice({
+            filters: [{name: deviceName}],
+            optionalServices: [bleService]
+        })
+        .then(device => {
+            console.log('Device Selected:', device.name);
+            bleStateContainer.innerHTML = 'Connected to device ' + device.name;
+            bleStateContainer.style.color = "#24af37";
+            device.addEventListener('gattservicedisconnected', onDisconnected);
+                motor_1_card.classList.remove('success');
+                motor_1_card.classList.remove('failure');
+                motor_2_card.classList.remove('success');
+                motor_2_card.classList.remove('failure');
+                motor_3_card.classList.remove('success');
+                motor_3_card.classList.remove('failure');
+            return device.gatt.connect();
+        })
+        .then(gattServer =>{
+            bleServer = gattServer;
+            console.log("Connected to GATT Server");
+            return bleServer.getPrimaryService(bleService);
+        })
+        .then(service => {
+            bleServiceFound = service;
+            console.log("Service discovered:", service.uuid);
+            return service.getCharacteristic(sensorCharacteristic);
+        })
+        .then(characteristic => {
+            console.log("Characteristic discovered:", characteristic.uuid);
+            sensorCharacteristicFound = characteristic;
+            characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicChange);
+            characteristic.startNotifications();
+            console.log("Notifications Started.");
+            $('#disconnectBleButton').removeAttr('disabled');
+            $('#connectBleButton').attr('disabled', true);
+            $(".disconnected").addClass('connected');
+            $("#battery_voltage").collapse('show');
+            $('#firmware_version').collapse('show');
+            setTimeout(function(){writeOnCharacteristic(4);}, 1000);
+            return characteristic.readValue();
+        })
+        .then(value => {
+            const decodedValue = new TextDecoder().decode(value);
+            matches = /\*(.*)\*(.*)/.exec(decodedValue);
+            if(matches){
+                switch(matches[1]) {
+                    case 'm1':
+                        motor_1_msg.innerHTML = matches[2];
+                        if(sre.test(matches[2])){
+                            motor_1_card.classList.add('success');
+                            motor_1_card.classList.remove('failure');
+                        }
+                        if(fre.test(matches[2])){
+                            motor_1_card.classList.remove('success');
+                            motor_1_card.classList.add('failure');
+                        }
+                        break;
+                    case 'm2':
+                        motor_2_msg.innerHTML = matches[2];
+                        if(sre.test(matches[2])){
+                            motor_2_card.classList.add('success');
+                            motor_2_card.classList.remove('failure');
+                        }
+                        if(fre.test(matches[2])){
+                            motor_2_card.classList.remove('success');
+                            motor_2_card.classList.add('failure');
+                        }
+                        break;
+                    case 'm3':
+                        motor_3_msg.innerHTML = matches[2];
+                        if(sre.test(matches[2])){
+                            motor_3_card.classList.add('success');
+                            motor_3_card.classList.remove('failure');
+                        }
+                        if(fre.test(matches[2])){
+                            motor_3_card.classList.remove('success');
+                            motor_3_card.classList.add('failure');
+                        }
+                        break;
+                    case 'a':
+                        $('.modal-body').html(matches[2]);
+                        $('#message_model').modal({
+                        keyboard: false
+                        });
+                        break;
+                    case 'b':
+                        $('#balancing_type').html(matches[2]);
+                        $('#balancing').collapse('show');
+                        break;
+                    case 'nb':
+                        $('#balancing_type').html("");
+                        $('#balancing').collapse('hide');
+                        break;
+                    case 'fv':
+                        if(parseFloat(matches[2]) < latest_firmware_version) {
+                            $('.modal-body').html("The cube you connected to is running an old firmware (" + matches[2] + "). Update to the latest version(" + latest_firmware_version +")");
+                            $('#message_model').modal({
+                                keyboard: false
+                            });                           
+                        }
+                        $('#firmware_version').html('(Firmware version: ' + matches[2] + ')');
+                        break;
+                    case 'sm':
+                        motor_settings = /(.*)\|(.*)\|(.*)/.exec(matches[2]);
+                        motor_settings = [motor_settings[1],motor_settings[2],motor_settings[3]]
+                        $("#motor1_config").val(motor_settings[0]);
+                        $("#motor2_config").val(motor_settings[1]);
+                        $("#motor3_config").val(motor_settings[2]);
+                        break;
+                    case 'sl':
+                        led_settings = /(\d*)\|(\d*)\|(\d*)\|(\d*)\|(\d*)\|(\d*)/.exec(matches[2]);
+                        $("#rgbColorV").val(rgbToHex(led_settings[1],led_settings[2],led_settings[3]));
+                        $("#rgbColorE").val(rgbToHex(led_settings[4],led_settings[5],led_settings[6]));
+                        break;
+                    default:
+                        break;
+                }
+            }         
+        })
+        .catch(error => {
+            console.log('Error: ', error);
+        })
+    }
+
+    function componentToHex(c) {
+            let hex = parseInt(c).toString(16);
+            return hex.length === 1 ? "0" + hex : hex;
+    }
+    function rgbToHex(r, g, b) {
+        return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+    }
+
+    function onDisconnected(event){
+        console.log('Device Disconnected:', event.target.device.name);
+        bleStateContainer.innerHTML = "Device disconnected";
+        bleStateContainer.style.color = "#d13a30";
+        $('#firmware_version').collapse('hide');
+        $(".disconnected").removeClass('connected');
+        $('#disconnectBleButton').attr('disabled', true);
+        $('#connectBleButton').removeAttr('disabled');
+        $("#battery_voltage").collapse('hide');
+
+        motor_1_card.classList.remove('success');
+                motor_1_card.classList.remove('failure');
+                motor_2_card.classList.remove('success');
+                motor_2_card.classList.remove('failure');
+                motor_3_card.classList.remove('success');
+                motor_3_card.classList.remove('failure');
+        connectToDevice();
+    }
+
+    function handleCharacteristicChange(event){
+        const newValueReceived = new TextDecoder().decode(event.target.value);
+            matches = /\*(.*)\*(.*)/.exec(newValueReceived);
+            if(matches){
+                switch(matches[1]) {
+                    case 'm1':
+                        motor_1_msg.innerHTML = matches[2];   
+                        motor_1_card.classList.remove('success');
+                        motor_1_card.classList.remove('failure');
+                        width = getElementWidthPercentage('#motor_1_progress');
+                        if(matches[2] == 'Stop'){                    
+                            for(i=0; i< 33; i++){
+                                width += 1;
+                                $('#motor_1_progress').css("width", width + "%");
+                            }
+                        }
+                        if(sre.test(matches[2])){                            
+                            for(var i=0; i< 34; i++){
+                                width += 1;
+                                $('#motor_1_progress').css("width", width + "%");
+                            }
+                            setTimeout(function(){$('#motor_1_progress_holder').collapse('hide');}, 2000);
+                            motor_1_card.classList.add('bg-success');
+                            motor_1_card.classList.remove('bg-danger');
+                            width= 0;
+                        }
+                        if(fre.test(matches[2])){
+                            for(var i=0; i< 34; i++){
+                                width += 1;
+                                $('#motor_1_progress').css("width", width + "%");
+                            }
+                            setTimeout(function(){$('#motor_1_progress_holder').collapse('hide');}, 2000);
+                            motor_1_card.classList.remove('bg-success');
+                            motor_1_card.classList.add('bg-danger');
+                            motors_working = false;
+                        }
+
+                        break
+                    case 'm2':
+                        motor_2_msg.innerHTML = matches[2];   
+                        motor_2_card.classList.remove('success');
+                        motor_2_card.classList.remove('failure');           
+                        width = getElementWidthPercentage('#motor_2_progress');
+                            
+                        if(matches[2] == 'Stop'){
+                            for(var i=0; i< 33; i++){
+                                width += 1;
+                                $('#motor_2_progress').css("width", width + "%");
+                            }
+                        }
+                        if(sre.test(matches[2])){
+                            for(var i=0; i< 34; i++){
+                                width += 1;
+                                $('#motor_2_progress').css("width", width + "%");
+                            }
+                            setTimeout(function(){$('#motor_2_progress_holder').collapse('hide');}, 2000);
+                            motor_2_card.classList.add('bg-success');
+                            motor_2_card.classList.remove('bg-danger');
+                        }
+                        if(fre.test(matches[2])){
+                            for(var i=0; i< 34; i++){
+                                width += 1;
+                                $('#motor_2_progress').css("width", width + "%");
+                            }
+                            setTimeout(function(){$('#motor_2_progress_holder').collapse('hide');}, 2000);
+                            motor_2_card.classList.remove('bg-success');
+                            motor_2_card.classList.add('bg-danger');
+                            motors_working = false;
+                        }
+
+                        break;
+                    case 'm3':
+                        motor_3_card.classList.remove('success');
+                        motor_3_card.classList.remove('failure');
+                        motor_3_msg.innerHTML = matches[2];   
+                        width = getElementWidthPercentage('#motor_3_progress');
+                            
+                        if(matches[2] == 'Stop'){
+                            for(var i=0; i< 33; i++){
+                                width += 1;
+                                $('#motor_3_progress').css("width", width + "%");
+                            }
+                        }
+                        if(sre.test(matches[2])){
+                            for(var i=0; i< 34; i++){
+                                width += 1;
+                                $('#motor_3_progress').css("width", width + "%");
+                            }
+                            motor_3_card.classList.add('bg-success');
+                            motor_2_card.classList.remove('bg-danger');
+                            setTimeout(function(){$('#motor_3_progress_holder').collapse('hide');}, 2000)
+
+                            if(motors_working){
+                                $('.modal-body').html("All motor tests succedded. You should calibrate now");
+                                $('#message_model').modal({
+                                keyboard: false
+                                });
+                            } else {
+                                $('.modal-body').html("Some motor tests failed. check wiring.");
+                                $('#message_model').modal({
+                                    keyboard: false
+                                });
+
+                            }
+                        }
+                        if(fre.test(matches[2])){
+                            for(var i=0; i< 34; i++){
+                                width += 1;
+                                $('#motor_3_progress').css("width", width + "%");
+                            }
+                            setTimeout(function(){$('#motor_3_progress_holder').collapse('hide');}, 2000)
+                            motor_3_card.classList.remove('bg-success');
+                            motor_3_card.classList.add('bg-danger');
+                            $('.modal-body').html("Some motor tests failed. check wiring.");
+                            $('#message_model').modal({
+                                keyboard: false
+                            });
+                        }
+
+                        break;
+                    case 'a':
+                        $('.modal-body').html(matches[2]);
+                        $('#message_model').modal({
+                        keyboard: false
+                        });
+                        break;
+                    case 'sv':
+                        settings = /(.*)\|(.*)\|(.*)\|(.*)\|(.*)\|(.*)/.exec(matches[2]);
+                        $("#k1").html(settings[1]);
+                        $("#k2").html(settings[2]);
+                        $("#k3").html(settings[3]);
+                        $("#k4").html(settings[4]);
+                        $("#zk2").html(settings[5]);
+                        $("#zk3").html(settings[6]);
+                        break;
+                    case 'se':
+                        settings = /(.*)\|(.*)\|(.*)\|(.*)/.exec(matches[2]);
+                        $("#ek1").html(settings[1]);
+                        $("#ek2").html(settings[2]);
+                        $("#ek3").html(settings[3]);
+                        $("#ek4").html(settings[4]);
+                        break;
+                    case 'b':
+                        $('#balancing_type').html(matches[2]);
+                        $('#balancing').collapse('show');
+                        break;
+                    case 'nb':
+                        $('#balancing_type').html("");
+                        $('#balancing').collapse('hide');
+                        break;
+                    case 'bv':
+                        width = (9/(matches[2] - 7))  * 100;
+                        $("#battery_progress").html("Battery: " + matches[2] + "V");
+                        $('#battery_progress').css("width", width + "%");
+                        break;                    
+                    case 'fv':
+                        if(parseFloat(matches[2]) < latest_firmware_version) {
+                            $('.modal-body').html("The cube you connected to is running an old firmware (" + matches[2] + "). Update to the latest version(" + latest_firmware_version +")");
+                            $('#message_model').modal({
+                                keyboard: false
+                            });                           
+                        }
+                        $('#firmware_version').html('(Firmware version: ' + matches[2] + ')');
+                        break;
+                    case 'sm':
+                        motor_settings = /(.*)\|(.*)\|(.*)/.exec(matches[2]);
+                        motor_settings = [motor_settings[1],motor_settings[2],motor_settings[3]];
+                        $("#motor1_config").val(motor_settings[0]);
+                        $("#motor2_config").val(motor_settings[1]);
+                        $("#motor3_config").val(motor_settings[2]);
+                        break;
+                    case 'sl':
+                       led_settings = /(\d*)\|(\d*)\|(\d*)\|(\d*)\|(\d*)\|(\d*)/.exec(matches[2]);
+                        $("#rgbColorV").val(rgbToHex(led_settings[1],led_settings[2],led_settings[3]));
+                        $("#rgbColorE").val(rgbToHex(led_settings[4],led_settings[5],led_settings[6]));
+                        break;
+                     default:
+                        break;
+                }
+            }
+        //timestampContainer.innerHTML = getDateTime();
+    }
+
+    function writeOnCharacteristic(value){
+        if (bleServer && bleServer.connected) {
+            bleServiceFound.getCharacteristic(testMotorCharacteristic)
+            .then(characteristic => {
+                if(value == 1) {
+                    motor_1_card.classList.remove('success');
+                    motor_1_card.classList.remove('failure');
+                    motor_2_card.classList.remove('success');
+                    motor_2_card.classList.remove('failure');
+                    motor_3_card.classList.remove('success');
+                    motor_3_card.classList.remove('failure');
+                    motor_1_msg.innerHTML=""
+                    motor_2_msg.innerHTML=""
+                    motor_3_msg.innerHTML="";
+                }
+                console.log("Found the Test Motor characteristic: ", characteristic.uuid);
+                return characteristic.writeValue(new TextEncoder().encode(value));
+            })
+            .then(() => {
+                //latestValueSent.innerHTML = value;
+                console.log("Value written to testMotorCharacteristic:", value);
+            })
+            .catch(error => {
+                console.error("Error writing to the testMotorCharacteristic: ", error);
+            });
+        } else {
+            console.error ("Bluetooth is not connected. Cannot write to characteristic.")
+            window.alert("Bluetooth is not connected. Cannot write to characteristic. \n Connect to BLE first!")
+        }
+    }
+
+    function disconnectDevice() {     
+        $(".disconnected").removeClass('connected');
+        $('#disconnectBleButton').attr('disabled', true);
+        $('#connectBleButton').removeAttr('disabled');                   
+        $("#battery_voltage").collapse('hide');
+
+        if (bleServer && bleServer.connected) {
+            if (sensorCharacteristicFound) {
+                sensorCharacteristicFound.stopNotifications()
+                    .then(() => {
+                        console.log("Notifications Stopped");
+                        return bleServer.disconnect();
+                    })
+                    .then(() => {
+                        console.log("Device Disconnected");
+                        bleStateContainer.innerHTML = "Device Disconnected";
+                        bleStateContainer.style.color = "#d13a30";
+
+                    })
+                    .catch(error => {
+                        console.log("An error occurred:", error);
+                    });
+            } else {
+                console.log("No characteristic found to disconnect.");
+            }
+        } else {
+            // Throw an error if Bluetooth is not connected
+            console.error("Bluetooth is not connected.");
+            window.alert("Bluetooth is not connected.")
+        }
+    }
+
+    function getDateTime() {
+        var currentdate = new Date();
+        var day = ("00" + currentdate.getDate()).slice(-2); // Convert day to string and slice
+        var month = ("00" + (currentdate.getMonth() + 1)).slice(-2);
+        var year = currentdate.getFullYear();
+        var hours = ("00" + currentdate.getHours()).slice(-2);
+        var minutes = ("00" + currentdate.getMinutes()).slice(-2);
+        var seconds = ("00" + currentdate.getSeconds()).slice(-2);
+        
+        var datetime = day + "/" + month + "/" + year + " at " + hours + ":" + minutes + ":" + seconds;
+        return datetime;
+    }
+
+    function getElementWidthPercentage(element) {
+        var elementWidth = $(element).width(); // Get the element's width in pixels
+        var parentWidth = $(element).parent().width(); // Get the parent's width in pixels
+
+        return (elementWidth / parentWidth) * 100; // Calculate the percentage
+    }
+</script>
+
+</html>
