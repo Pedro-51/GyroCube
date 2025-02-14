@@ -5,7 +5,7 @@ Balancing Cube project based on the "remrc" model: https://www.thingiverse.com/t
 
     Creation of an Application to facilitate calibration and motor testing,
     Merging the main program with the motors test program,
-    Creation of a printed circuit for those who wish to have a beautiful object (coming soon),
+    Creation of a printed circuit for those who wish to have a beautiful object,
     Addition of a Power button,
     Addition of a button to turn on the LEDs and change their colors,
     Modified the face files for placing the switches in 12 and 16mm. Thanks to dinomight.
