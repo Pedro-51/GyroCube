@@ -56,7 +56,7 @@ void RGB_Process(){
         }
         beep();
       }else{
-        j = 0; Push = false; LedRGB = true; 
+        Push = false; LedRGB = true; 
         colorLed(Red, Green, Blue, 1, 3, 80);
         colorLed(0, 0, 0, 1, 3, 80);
         colorLed(Red, Green, Blue, 1, 3, 0); beep ();
@@ -67,13 +67,14 @@ void RGB_Process(){
   }else{
     if (Push == true){
       if (j < 250){
-        if (RGB_val < 18){RGB_val++;}else{RGB_val = 0;}
+        if (RGB_val < 17){RGB_val++;}else{RGB_val = 0;}
         Red = RGB_Color[RGB_val][0]; Green = RGB_Color[RGB_val][1]; Blue = RGB_Color[RGB_val][2];
         colorLed(Red, Green, Blue, 1, 3, 0);
-        Push = false; j = 0;
+        Serial.println(RGB_val);
+        Push = false;
         beep();
       }else{
-        offsets.Red = Red; offsets.Green = Green; offsets.Blue = Blue; offsets.ID = 96;
+        offsets.Red = Red; offsets.Green = Green; offsets.Blue = Blue; offsets.RGB_val = RGB_val;
         save();
         colorLed(0, 0, 0, 1, 3, 0); 
         beep (); colorLed(Red, Green, Blue, 1, 3, 0); 
@@ -316,6 +317,7 @@ int Tuning() {
       if (cmd == '1'){
         f = 1; lock = 0; Mode = 1; loop_time = 100;
       }
+      colorLed(0, 0, 0, 1, 3, 0);
       XYZ_to_threeWay(0, 0, 0);
       digitalWrite(BRAKE, LOW);
       motors_speed_X = 0;
@@ -432,8 +434,8 @@ int Tuning() {
       if (cmd == '+' && !calibrating) {
         calibrating = true;
         SerialBT.println("11");
-        Serial.println("Calibrating on.");
-        Serial.println("Set the cube on vertex...");
+        Serial.println("Calibration en cours.");
+        Serial.println("Placer le cube en position Vertex...");
         colorLed(50, 50, 0, 1, 3, 0);
         beep(); 
       }
@@ -447,7 +449,7 @@ int Tuning() {
           offsets.acZv = AcZ + 16384;
           SerialBT.println("12");
           Serial.println("Vertex OK.");
-          Serial.println("Set the cube on Edge...");
+          Serial.println("Placer le cube en position Edge...");
           vertex_calibrated = true;
           colorLed(0, 50, 50, 1, 3, 0);
           beep();
@@ -462,11 +464,11 @@ int Tuning() {
           save();
           calibrated = true;
           calibrating = false;
-          Serial.println("Calibrating off.");
+          Serial.println("Calibration off.");
           beep();
         } else {
           SerialBT.println("14");
-          Serial.println("The angles are wrong!!!");
+          Serial.println("Mauvaise orientation du cube!!!");
           beep();
           beep();
         }

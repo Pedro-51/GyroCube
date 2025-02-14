@@ -19,13 +19,13 @@ void setup() {
   digitalWrite(BRAKE, HIGH);
   pinMode(INT_LED, INPUT);
 
-  for (i=0;i<250;i+=10){ colorLed(i, i, 0, 1, 3, 5);}
+  for (i=0;i<250;i+=10){ colorLed(i, i, 0, 1, 3, 0);}
   for (RGB_val=0;RGB_val<18;RGB_val++){
     Red = RGB_Color[RGB_val][0]; Green = RGB_Color[RGB_val][1]; Blue  = RGB_Color[RGB_val][2];
     colorLed(Red, Green, Blue, 1, 3, 80); //Red, Green, Blue, FirstPixel, LastPixel, Delay
   }
   for (i=250;i>0;i-=10){colorLed(i, i*0.68, 0, 1, 3, 5);}
-  colorLed(0, 0, 0, 1, 3, 5);
+  colorLed(0, 0, 0, 1, 3, 0);
   
   pinMode(DIR1, OUTPUT);
   pinMode(ENC1_1, INPUT);
@@ -58,7 +58,7 @@ void setup() {
   //offsets.ID = 0; // for debug
   if(offsets.ID == 255){
     offsets.ID = 0;
-    offsets.Red = Red; offsets.Green = Green; offsets.Blue = Blue;
+    offsets.Red = Red; offsets.Green = Green; offsets.Blue = Blue; offsets.RGB_val = RGB_val;
     offsets.K1 = K1; offsets.K2 = K2; offsets.K3 = K3; offsets.K4 = K4; offsets.zK2 = zK2; offsets.zK3 = zK3;
     offsets.eK1 = eK1; offsets.eK2 = eK2; offsets.eK3 = eK3; offsets.eK4 = eK4;
     save();
@@ -132,6 +132,7 @@ void loop() {
   if (Mode == 1 ){
       switch (f) {
         case 1:
+          colorLed(50, 50, 50, 1, 1, 0);
           digitalWrite(BRAKE, HIGH);
           if (lock) Serial.println("Test moteur 1."); SerialBT.println("46");
           Motor1_control(50);
@@ -173,9 +174,11 @@ void loop() {
           }
           s1 = "";
           Motor1_control(0);
+          colorLed(0, 0, 0, 1, 1, 0);
           break;      
   
         case 19:
+          colorLed(50, 50, 50, 2, 2, 0);
           digitalWrite(BRAKE, HIGH);
           if (lock) Serial.println("Test moteur 2."); SerialBT.println("47");
           Motor2_control(50);
@@ -217,9 +220,11 @@ void loop() {
           }
           s1 = "";
           Motor2_control(0);
+          colorLed(0, 0, 0, 2, 2, 0);
           break;        
   
         case 37:
+          colorLed(50, 50, 50, 3, 3, 0);
           digitalWrite(BRAKE, HIGH);
           if (lock) Serial.println("Test moteur 3."); SerialBT.println("48");
           Motor3_control(50);
@@ -262,6 +267,7 @@ void loop() {
           }
           s1 = "";
           Motor3_control(0);
+          colorLed(0, 0, 0, 3, 3, 0);
           break;        
         }
         lock = 0;

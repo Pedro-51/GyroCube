@@ -19,13 +19,13 @@ void setup() {
   digitalWrite(BRAKE, HIGH);
   pinMode(INT_LED, INPUT);
 
-  for (i=0;i<250;i+=10){ colorLed(i, i, 0, 1, 3, 5);}
+  for (i=0;i<250;i+=10){ colorLed(i, i, 0, 1, 3, 0);}
   for (RGB_val=0;RGB_val<18;RGB_val++){
     Red = RGB_Color[RGB_val][0]; Green = RGB_Color[RGB_val][1]; Blue  = RGB_Color[RGB_val][2];
     colorLed(Red, Green, Blue, 1, 3, 80); //Red, Green, Blue, FirstPixel, LastPixel, Delay
   }
   for (i=250;i>0;i-=10){colorLed(i, i*0.68, 0, 1, 3, 5);}
-  colorLed(0, 0, 0, 1, 3, 5);
+  colorLed(0, 0, 0, 1, 3, 0);
   
   pinMode(DIR1, OUTPUT);
   pinMode(ENC1_1, INPUT);
@@ -58,7 +58,7 @@ void setup() {
   //offsets.ID = 0; // for debug
   if(offsets.ID == 255){
     offsets.ID = 0;
-    offsets.Red = Red; offsets.Green = Green; offsets.Blue = Blue;
+    offsets.Red = Red; offsets.Green = Green; offsets.Blue = Blue; offsets.RGB_val = RGB_val;
     offsets.K1 = K1; offsets.K2 = K2; offsets.K3 = K3; offsets.K4 = K4; offsets.zK2 = zK2; offsets.zK3 = zK3;
     offsets.eK1 = eK1; offsets.eK2 = eK2; offsets.eK3 = eK3; offsets.eK4 = eK4;
     save();
@@ -123,7 +123,7 @@ void loop() {
       motors_speed_X = 0;
       motors_speed_Y = 0; 
       
-      if  (!calibrating and calibrated) {
+      if  (calibrated && !calibrating) {
         RGB_Process();
       }
     }
@@ -132,8 +132,9 @@ void loop() {
   if (Mode == 1 ){
       switch (f) {
         case 1:
+          colorLed(50, 50, 50, 1, 1, 0);
           digitalWrite(BRAKE, HIGH);
-          if (lock) Serial.println("Rotating motor 1."); SerialBT.println("46");
+          if (lock) Serial.println("Test moteur 1."); SerialBT.println("46");
           Motor1_control(50);
           break;
         case 4:
@@ -143,7 +144,7 @@ void loop() {
           break;      
         case 7:
           digitalWrite(BRAKE, HIGH);
-          if (lock) Serial.println("Change direction..."); SerialBT.println("42");
+          if (lock) Serial.println("Changement direction..."); SerialBT.println("42");
           Motor1_control(-50);
           break;
         case 10:
@@ -153,31 +154,33 @@ void loop() {
           break; 
         case 13:
           digitalWrite(BRAKE, HIGH);
-          if (lock) Serial.println("Checking encoder..."); SerialBT.println("43");
+          if (lock) Serial.println("Check de l'encodeur..."); SerialBT.println("43");
           Motor1_control(70);
           break; 
         case 16:
           digitalWrite(BRAKE, LOW);
           if (lock && motor1_speed > 300) {
-            Serial.println("Encoder OK."); 
-            Serial.print("Speed: "); Serial.println(motor1_speed);
+            Serial.println("Encodeur OK."); 
+            Serial.print("Vitesse: "); Serial.println(motor1_speed);
             s1.concat(motor1_speed);
             SerialBT.println("44"  + s1);
             Serial.println("Stop.");
           } else if (lock && motor1_speed <= 0) {
-            Serial.println("Encoder FAIL.");
-            Serial.print("Speed: "); Serial.println(motor1_speed);
+            Serial.println("Encodeur FAIL.");
+            Serial.print("Vitesse: "); Serial.println(motor1_speed);
             s1.concat(motor1_speed);
             SerialBT.println("45"  + s1);
             Serial.println("Stop.");
           }
           s1 = "";
           Motor1_control(0);
+          colorLed(0, 0, 0, 1, 1, 0);
           break;      
   
         case 19:
+          colorLed(50, 50, 50, 2, 2, 0);
           digitalWrite(BRAKE, HIGH);
-          if (lock) Serial.println("Rotating motor 2."); SerialBT.println("47");
+          if (lock) Serial.println("Test moteur 2."); SerialBT.println("47");
           Motor2_control(50);
           break;
         case 22:
@@ -187,7 +190,7 @@ void loop() {
           break;      
         case 25:
           digitalWrite(BRAKE, HIGH);
-          if (lock) Serial.println("Change direction..."); SerialBT.println("42");
+          if (lock) Serial.println("Changement direction..."); SerialBT.println("42");
           Motor2_control(-50);
           break;
         case 28:
@@ -197,31 +200,33 @@ void loop() {
           break; 
         case 31:
           digitalWrite(BRAKE, HIGH);
-          if (lock) Serial.println("Checking encoder..."); SerialBT.println("43");
+          if (lock) Serial.println("Check de l'encodeur..."); SerialBT.println("43");
           Motor2_control(70);
           break; 
         case 34:
           digitalWrite(BRAKE, LOW);
           if (lock && motor2_speed > 300) {
-            Serial.println("Encoder OK.");
-            Serial.print("Speed: "); Serial.println(motor2_speed);
+            Serial.println("Encodeur OK.");
+            Serial.print("Vitesse: "); Serial.println(motor2_speed);
             s1.concat(motor2_speed);
             SerialBT.println("44"  + s1);
             Serial.println("Stop.");
           } else if (lock && motor2_speed <= 0) {
-            Serial.println("Encoder FAIL.");
-            Serial.print("Speed: "); Serial.println(motor2_speed);
+            Serial.println("Encodeur FAIL.");
+            Serial.print("Vitesse: "); Serial.println(motor2_speed);
             s1.concat(motor2_speed);
             SerialBT.println("45"  + s1);
             Serial.println("Stop.");
           }
           s1 = "";
           Motor2_control(0);
+          colorLed(0, 0, 0, 2, 2, 0);
           break;        
   
         case 37:
+          colorLed(50, 50, 50, 3, 3, 0);
           digitalWrite(BRAKE, HIGH);
-          if (lock) Serial.println("Rotating motor 3."); SerialBT.println("48");
+          if (lock) Serial.println("Test moteur 3."); SerialBT.println("48");
           Motor3_control(50);
           break;
         case 40:
@@ -232,7 +237,7 @@ void loop() {
           break;      
         case 43:
           digitalWrite(BRAKE, HIGH);
-          if (lock) Serial.println("Change direction..."); SerialBT.println("42");
+          if (lock) Serial.println("Changement direction..."); SerialBT.println("42");
           Motor3_control(-50);
           break;
         case 46:
@@ -242,26 +247,27 @@ void loop() {
           break; 
         case 49:
           digitalWrite(BRAKE, HIGH);
-          if (lock) Serial.println("Checking encoder..."); SerialBT.println("43");
+          if (lock) Serial.println("Check de l'encodeur..."); SerialBT.println("43");
           Motor3_control(70);
           break; 
         case 52:
           digitalWrite(BRAKE, LOW);
           if (lock && motor3_speed > 300) {
-            Serial.println("Encoder OK.");
-            Serial.print("Speed: "); Serial.println(motor3_speed);
+            Serial.println("Encodeur OK.");
+            Serial.print("Vitesse: "); Serial.println(motor3_speed);
             s1.concat(motor3_speed);
             SerialBT.println("44"  + s1);
             Serial.println("Stop.");
           } else if (lock && motor3_speed <= 0) {
-            Serial.println("Encoder FAIL.");
-            Serial.print("Speed: "); Serial.println(motor3_speed);
+            Serial.println("Encodeur FAIL.");
+            Serial.print("Vitesse: "); Serial.println(motor3_speed);
             s1.concat(motor3_speed);
             SerialBT.println("45"  + s1);
             Serial.println("Stop.");
           }
           s1 = "";
           Motor3_control(0);
+          colorLed(0, 0, 0, 3, 3, 0);
           break;        
         }
         lock = 0;
@@ -274,7 +280,7 @@ void loop() {
     battVoltage((double)analogRead(VBAT) / 204); // value 204 must be selected by measuring battery voltage!
     
     if (!calibrated && !calibrating) {
-      Serial.println("first you need to calibrate the balancing points...");
+      Serial.println("Tu doit d'abord procéder au calibrage des points d'équilibres...");
       SerialBT.println("95");
       if (!calibrated_leds) {
         colorLed(0, 50, 0, 1, 3, 0); 
@@ -287,7 +293,7 @@ void loop() {
     
     if (Mode == 1){
       f++; 
-      if (f == 53){ beep(); Serial.println("End of Engine Tests."); SerialBT.println("96"); f = 1; Mode = 0;} 
+      if (f == 53){ beep(); Serial.println("Fin des tests Moteurs."); SerialBT.println("96"); f = 1; Mode = 0;} 
     lock = 1;
     }
     previousT_2 = currentT;

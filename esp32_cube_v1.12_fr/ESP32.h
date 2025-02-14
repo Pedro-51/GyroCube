@@ -58,7 +58,7 @@ struct OffsetsObj {
   float acXv; float acYv; float acZv; float acXe; float acYe; float acZe; 
   float K1;   float K2;   float K3;   float K4;   float zK2;  float zK3;
   float eK1;  float eK2;  float eK3;  float eK4;
-  byte Red;   byte Green; byte Blue;
+  byte Red;   byte Green; byte Blue;  byte RGB_val;
 };
 OffsetsObj offsets;
 
@@ -81,9 +81,9 @@ volatile int  enc_count1 = 0, enc_count2 = 0, enc_count3 = 0;
 int16_t motor1_speed; int16_t motor2_speed; int16_t motor3_speed; 
 
 byte f; word i; byte j; byte k; bool lock; byte Mode;   
-bool Push; bool LedRGB; byte RGB_val; bool ChooseColor;
-byte Red = 255, Green = 255, Blue = 0; 
- 
+bool Push; bool LedRGB; byte RGB_val;  bool ChooseColor; 
+byte Red = 255, Green = 255, Blue = 0;
+
 String s1 = "";
 
 bool ConnectBT = false;        
