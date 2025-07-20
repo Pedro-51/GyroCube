@@ -19,7 +19,7 @@ void init_BT()
 {
         Mode = 0; loop_time = 15;
         calibrating = false;
-        colorLed(0, 0, 0, 1, 3, 0);
+        colorLed(0, 0, 0, 1, 12, 0);
         LedRGB = false;
 }
 
@@ -48,18 +48,18 @@ void RGB_Process(){
     if (Push == true){
       if (j < 250){
         if (LedRGB == true){
-          colorLed(0, 0, 0, 1, 3, 0);
+          colorLed(0, 0, 0, 1, 12, 0);
           LedRGB = false;
         }else{
-          colorLed(Red, Green, Blue, 1, 3, 0);
+          colorLed(Red, Green, Blue, 1, 12, 0);
           LedRGB = true;
         }
         beep();
       }else{
         Push = false; LedRGB = true; 
-        colorLed(Red, Green, Blue, 1, 3, 80);
-        colorLed(0, 0, 0, 1, 3, 80);
-        colorLed(Red, Green, Blue, 1, 3, 0); beep ();
+        colorLed(Red, Green, Blue, 1, 12, 80);
+        colorLed(0, 0, 0, 1, 12, 80);
+        colorLed(Red, Green, Blue, 1, 12, 0); beep ();
         while (digitalRead(INT_LED) == LOW){}
         delay (5); ChooseColor = true;
       }
@@ -69,14 +69,14 @@ void RGB_Process(){
       if (j < 250){
         if (RGB_val < 17){RGB_val++;}else{RGB_val = 0;}
         Red = RGB_Color[RGB_val][0]; Green = RGB_Color[RGB_val][1]; Blue = RGB_Color[RGB_val][2];
-        colorLed(Red, Green, Blue, 1, 3, 0);
+        colorLed(Red, Green, Blue, 1, 12, 0);
         Push = false;
         beep();
       }else{
         offsets.Red = Red; offsets.Green = Green; offsets.Blue = Blue; offsets.RGB_val = RGB_val;
         save();
-        colorLed(0, 0, 0, 1, 3, 0); 
-        beep (); colorLed(Red, Green, Blue, 1, 3, 0); 
+        colorLed(0, 0, 0, 1, 12, 0); 
+        beep (); colorLed(Red, Green, Blue, 1, 12, 0); 
         beep ();
         Push = false; ChooseColor = false;
       }
@@ -102,7 +102,7 @@ void angle_setup() {
   delay (100);
   
   beep();
-  colorLed(50, 0, 0, 3, 3, 0);
+  colorLed(50, 0, 0, 9, 12, 0);
   for (int i = 0; i < 512; i++) {
     angle_calc();
     GyZ_offset_sum += GyZ;
@@ -111,9 +111,9 @@ void angle_setup() {
   GyZ_offset = GyZ_offset_sum >> 9;
   Serial.print("GyZ offset value = "); Serial.println(GyZ_offset);
   beep();
-  colorLed(0, 0, 0, 3, 3, 0);
+  colorLed(0, 0, 0, 9, 12, 0);
 
-  colorLed(50, 0, 0, 2, 2, 0);
+  colorLed(50, 0, 0, 5, 8, 0);
   for (int i = 0; i < 512; i++) {
     angle_calc();
     GyY_offset_sum += GyY;
@@ -122,9 +122,9 @@ void angle_setup() {
   GyY_offset = GyY_offset_sum >> 9;
   Serial.print("GyY offset value = "); Serial.println(GyY_offset);
   beep();
-  colorLed(0, 0, 0, 2, 2, 0);
+  colorLed(0, 0, 0, 5, 8, 0);
 
-  colorLed(50, 0, 0, 1, 1, 0);
+  colorLed(50, 0, 0, 1, 4, 0);
   for (int i = 0; i < 512; i++) {
     angle_calc();
     GyX_offset_sum += GyX;
@@ -132,13 +132,13 @@ void angle_setup() {
   }
   GyX_offset = GyX_offset_sum >> 9;
   Serial.print("GyX offset value = "); Serial.println(GyX_offset);
-  colorLed(50, 0, 0, 1, 1, 150);
+  colorLed(0, 0, 0, 1, 4, 150);
   beep();
   beep();
-  colorLed(50, 0, 0, 1, 3, 300);
-  colorLed(0, 0, 0, 1, 3, 150);
-  colorLed(50, 0, 0, 1, 3, 300);
-  colorLed(0, 0, 0, 1, 3, 0);
+  colorLed(50, 0, 0, 1, 12, 300);
+  colorLed(0, 0, 0, 1, 12, 150);
+  colorLed(50, 0, 0, 1, 12, 300);
+  colorLed(0, 0, 0, 1, 12, 0);
 }
 
 void angle_calc() {
@@ -217,10 +217,10 @@ void battVoltage(double voltage) {
   if (voltage > 7 && voltage <= 9.6) {
     if (digitalRead(BUZZER) == LOW){
       digitalWrite(BUZZER, HIGH); 
-      colorLed(0, 50, 0, 1, 3, 0);
+      colorLed(0, 50, 0, 1, 12, 0);
       } else {
       digitalWrite(BUZZER, LOW); 
-      colorLed(0, 0, 0, 1, 3, 0);
+      colorLed(0, 0, 0, 1, 12, 0);
     }
   } else {
     digitalWrite(BUZZER, LOW);
@@ -316,7 +316,7 @@ int Tuning() {
       if (cmd == '1'){
         f = 1; lock = 0; Mode = 1; loop_time = 100;
       }
-      colorLed(0, 0, 0, 1, 3, 0);
+      colorLed(0, 0, 0, 1, 12, 0);
       XYZ_to_threeWay(0, 0, 0);
       digitalWrite(BRAKE, LOW);
       motors_speed_X = 0;
@@ -435,7 +435,7 @@ int Tuning() {
         SerialBT.println("11");
         Serial.println("Calibration en cours.");
         Serial.println("Placer le cube en position Vertex...");
-        colorLed(50, 50, 0, 1, 3, 0);
+        colorLed(50, 50, 0, 1, 12, 0);
         beep(); 
       }
       
@@ -450,7 +450,7 @@ int Tuning() {
           Serial.println("Vertex OK.");
           Serial.println("Placer le cube en position Edge...");
           vertex_calibrated = true;
-          colorLed(0, 50, 50, 1, 3, 0);
+          colorLed(0, 50, 50, 1, 12, 0);
           beep();
         } else if (abs(AcX) > 7000 && abs(AcX) < 10000 && abs(AcY) < 2000 && vertex_calibrated) {
           //Serial.print("X: "); SerialBT.print(AcX); SerialBT.print(" Y: "); SerialBT.print(AcY); SerialBT.print(" Z: "); SerialBT.println(AcZ + 16384);
@@ -459,7 +459,7 @@ int Tuning() {
           offsets.acXe = AcX;
           offsets.acYe = AcY;
           offsets.acZe = AcZ + 16384;
-          colorLed(0, 0, 0, 1, 3, 0);
+          colorLed(0, 0, 0, 1, 12, 0);
           save();
           calibrated = true;
           calibrating = false;

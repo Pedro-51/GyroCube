@@ -19,13 +19,13 @@ void setup() {
   digitalWrite(BRAKE, HIGH);
   pinMode(INT_LED, INPUT);
 
-  for (i=0;i<250;i+=10){ colorLed(i, i, 0, 1, 3, 0);}
+  for (i=0;i<250;i+=10){ colorLed(i, i, 0, 1, 12, 0);}
   for (RGB_val=0;RGB_val<18;RGB_val++){
     Red = RGB_Color[RGB_val][0]; Green = RGB_Color[RGB_val][1]; Blue  = RGB_Color[RGB_val][2];
-    colorLed(Red, Green, Blue, 1, 3, 80); //Red, Green, Blue, FirstPixel, LastPixel, Delay
+    colorLed(Red, Green, Blue, 1, 12, 80); //Red, Green, Blue, FirstPixel, LastPixel, Delay
   }
-  for (i=250;i>0;i-=10){colorLed(i, i*0.68, 0, 1, 3, 5);}
-  colorLed(0, 0, 0, 1, 3, 0);
+  for (i=250;i>0;i-=10){colorLed(i, i*0.68, 0, 1, 12, 5);}
+  colorLed(0, 0, 0, 1, 12, 0);
   
   pinMode(DIR1, OUTPUT);
   pinMode(ENC1_1, INPUT);
@@ -132,7 +132,7 @@ void loop() {
   if (Mode == 1 ){
       switch (f) {
         case 1:
-          colorLed(50, 50, 50, 1, 1, 0);
+          colorLed(50, 50, 50, 1, 4, 0);
           digitalWrite(BRAKE, HIGH);
           if (lock) Serial.println("Test moteur 1."); SerialBT.println("46");
           Motor1_control(50);
@@ -174,11 +174,11 @@ void loop() {
           }
           s1 = "";
           Motor1_control(0);
-          colorLed(0, 0, 0, 1, 1, 0);
+          colorLed(0, 0, 0, 1, 4, 0);
           break;      
   
         case 19:
-          colorLed(50, 50, 50, 2, 2, 0);
+          colorLed(50, 50, 50, 5, 8, 0);
           digitalWrite(BRAKE, HIGH);
           if (lock) Serial.println("Test moteur 2."); SerialBT.println("47");
           Motor2_control(50);
@@ -220,11 +220,11 @@ void loop() {
           }
           s1 = "";
           Motor2_control(0);
-          colorLed(0, 0, 0, 2, 2, 0);
+          colorLed(0, 0, 0, 5, 8, 0);
           break;        
   
         case 37:
-          colorLed(50, 50, 50, 3, 3, 0);
+          colorLed(50, 50, 50, 9, 12, 0);
           digitalWrite(BRAKE, HIGH);
           if (lock) Serial.println("Test moteur 3."); SerialBT.println("48");
           Motor3_control(50);
@@ -267,7 +267,7 @@ void loop() {
           }
           s1 = "";
           Motor3_control(0);
-          colorLed(0, 0, 0, 3, 3, 0);
+          colorLed(0, 0, 0, 9, 12, 0);
           break;        
         }
         lock = 0;
@@ -283,10 +283,10 @@ void loop() {
       Serial.println("Tu doit d'abord procéder au calibrage des points d'équilibres...");
       SerialBT.println("95");
       if (!calibrated_leds) {
-        colorLed(0, 50, 0, 1, 3, 0); 
+        colorLed(0, 50, 0, 1, 12, 0); 
         calibrated_leds = true; 
       } else {
-        colorLed(0, 0, 0, 1, 3, 0); 
+         (0, 0, 0, 1, 12, 0); 
         calibrated_leds = false; 
       }
     }

@@ -37,7 +37,7 @@
 #define EEPROM_SIZE   128
 
 #define LED_PIN       23    // Pin that connects to WS2812B
-#define NUM_PIXELS    3      // The number of LEDs (pixels) on WS2812B
+#define NUM_PIXELS    12      // The number of LEDs (pixels) on WS2812B
 
 float K1 = 140.00, K2 = 15.00, K3 = 1.10, K4 = 0.012, zK2 = 8.00, zK3 = 0.30; 
 float eK1 = 150.00, eK2 = 16.00, eK3 = 2.60, eK4 = 0.004;
