@@ -10,7 +10,7 @@ Balancing Cube project based on the "remrc" model: https://www.thingiverse.com/t
     Addition of a button to turn on the LEDs and change their colors,
     Modified the face files for placing the switches in 12 and 16mm. Thanks to dinomight.
 
-Explanatory video: https://youtu.be/hunA4mQBg2g<br>
+Explanatory video: https://youtu.be/zuOgj580Nhk<br>
 Led function video: https://youtu.be/vczHyelNjr4<br>
 PCB: https://www.pcbway.com/project/shareproject/GyroCube_v1_1_5d583cf0.html<br>
 Android app: [French](Appli%20APK/Cube_1_01_fr.apk),[English](Appli%20APK/Cube_1_01_en.apk)<br>
