@@ -16,7 +16,9 @@ PCB: https://www.pcbway.com/project/shareproject/GyroCube_v1_1_5d583cf0.html<br>
 Android app: [French](Appli%20APK/Cube_1_01_fr.apk),[English](Appli%20APK/Cube_1_01_en.apk)<br>
 
 #######################################################################################
+
 For the program to work, you need to install esp32 by expressif v2.0.17 board version
+
 #######################################################################################
 
 ## 12-5-2024 (Dinomight/Darkmadda)
