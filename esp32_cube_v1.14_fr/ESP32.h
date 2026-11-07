@@ -1,3 +1,10 @@
+#pragma once
+#include <Arduino.h>
+#include <Wire.h>
+#include <EEPROM.h>
+#include <BluetoothSerial.h>
+#include <FastLED.h>
+
 #define BUZZER      27
 #define VBAT        34
 #define INT_LED     39
@@ -34,18 +41,34 @@
 #define accSens 0            // 0 = 2g, 1 = 4g, 2 = 8g, 3 = 16g
 #define gyroSens 0           // 0 = 250rad/s, 1 = 500rad/s, 2 1000rad/s, 3 = 2000rad/s
 
-#define EEPROM_SIZE   128
+#define EEPROM_SIZE    128
 
-#define LED_PIN       23    // Pin that connects to WS2812B
-#define NUM_PIXELS    12      // The number of LEDs (pixels) on WS2812B
+#define LED_PIN         23      // Pin that connects to WS2812B
+#define NUM_PIXELS      12      // The total number of LEDs (pixels) WS2812B 
+#define NUM_PIX_MOT      4      // The numbers of LEDS (pixels) per motors
+#define LED_LUX         50      // Brightness of LEDS (10 to 250)
 
-float K1 = 140.00, K2 = 15.00, K3 = 1.10, K4 = 0.012, zK2 = 8.00, zK3 = 0.30; 
-float eK1 = 150.00, eK2 = 16.00, eK3 = 2.60, eK4 = 0.004;
+float K1 = 180.00, K2 = 30.00, K3 = 1.60, K4 = 0.008, zK2 = 8.00, zK3 = 0.30; 
+float eK1 = 190.00, eK2 = 31.00, eK3 = 2.50, eK4 = 0.014;
 
 float Gyro_amount = 0.996;
 
 bool vertical_vertex = false;
 bool vertical_edge = false;
+
+const bool VERTEX_ROTATION_ENABLED = true; // true pour faire tourner le cube automatiquement en vertex
+
+byte edge_motor = 0;
+byte edge_candidate = 0;
+uint32_t edge_candidate_since = 0;
+struct EdgeAxis { float x; float y; };
+const EdgeAxis EDGE_AXES[4] = {
+  {0.0f, 0.0f}, {0.464f, 0.886f}, {0.556f, -0.831f}, {-1.0f, 0.0f}
+};
+const uint32_t EDGE_CONFIRM_MS = 200;
+const float EDGE_ARM_DEG = 0.3f; 
+const float EDGE_CUTOFF_DEG = 7.0f; 
+
 bool calibrating = false;
 bool vertex_calibrated = false;
 bool calibrated = false;
@@ -82,7 +105,7 @@ int16_t motor1_speed; int16_t motor2_speed; int16_t motor3_speed;
 
 byte f; word i; byte j; byte k; bool lock; byte Mode;   
 bool Push; bool LedRGB; byte RGB_val;  bool ChooseColor; 
-byte Red = 255, Green = 255, Blue = 0;
+byte Red = LED_LUX, Green = LED_LUX, Blue = 0;
 
 String s1 = "";
 
@@ -90,13 +113,16 @@ bool ConnectBT = false;
 word DelayBT = 1500;
 
 char RGB_Color[18][3] = {
-  {255, 255,   0}, {170, 255,   0}, 
-  { 85, 255,   0}, {  0, 255,   0}, 
-  {  0, 255,  85}, {  0, 255, 170}, 
-  {  0, 255, 255}, {  0, 170, 255}, 
-  {  0,  85, 255}, {  0,   0, 255}, 
-  { 85,   0, 255}, {170,   0, 255}, 
-  {255,   0, 255}, {255,   0, 170}, 
-  {255,   0,  85}, {255,   0,   0},
-  {255,  85,   0}, {255, 170,   0}
+  {LED_LUX, LED_LUX,   0}, {LED_LUX*0.7, LED_LUX,   0}, 
+  { LED_LUX*0.3, LED_LUX,   0}, {  0, LED_LUX,   0}, 
+  {  0, LED_LUX,  LED_LUX*0.3}, {  0, LED_LUX, LED_LUX*0.7}, 
+  {  0, LED_LUX, LED_LUX}, {  0, LED_LUX*0.7, LED_LUX}, 
+  {  0,  LED_LUX*0.3, LED_LUX}, {  0,   0, LED_LUX}, 
+  { LED_LUX*0.3,   0, LED_LUX}, {LED_LUX*0.7,   0, LED_LUX}, 
+  {LED_LUX,   0, LED_LUX}, {LED_LUX,   0, LED_LUX*0.7}, 
+  {LED_LUX,   0,  LED_LUX*0.3}, {LED_LUX,   0,   0},
+  {LED_LUX,  LED_LUX*0.3,   0}, {LED_LUX, LED_LUX*0.7,   0}
 };
+
+BluetoothSerial SerialBT;
+CRGB leds[NUM_PIXELS];
