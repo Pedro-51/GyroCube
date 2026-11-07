@@ -96,15 +96,32 @@ void loop() {
       
       int pwm_X = constrain(K1 * robot_angleX + K2 * gyroXfilt + K3 * speed_X + K4 * motors_speed_X, -255, 255);
       int pwm_Y = constrain(K1 * robot_angleY + K2 * gyroYfilt + K3 * speed_Y + K4 * motors_speed_Y, -255, 255);
-      int pwm_Z = 0; if (VERTEX_ROTATION_ENABLED) {pwm_Z = constrain(zK2 * gyroZ + zK3 * motors_speed_Z, -255, 255);}
+      bool spinStable = fabsf(robot_angleX) < VERTEX_SPIN_MAX_TILT &&
+                        fabsf(robot_angleY) < VERTEX_SPIN_MAX_TILT &&
+                        fabsf(gyroXfilt) < VERTEX_SPIN_MAX_GYRO &&
+                        fabsf(gyroYfilt) < VERTEX_SPIN_MAX_GYRO;
+      if (VERTEX_AUTO_SPIN && spinStable) {
+        if (vertexSpinStableSince == 0) vertexSpinStableSince = currentT;
+        if (currentT - vertexSpinStableSince >= VERTEX_SPIN_DELAY) {
+          vertexSpinTarget = fminf(VERTEX_SPIN_SPEED, vertexSpinTarget + VERTEX_SPIN_RAMP);
+        }
+      } else {
+        vertexSpinStableSince = 0;
+        vertexSpinTarget = 0.0f;
+      }
+      int pwm_Z = constrain(zK2 * (gyroZ - vertexSpinTarget) + zK3 * motors_speed_Z, -255, 255);
 
       motors_speed_X += speed_X / 5; 
       motors_speed_Y += speed_Y / 5;
       XYZ_to_threeWay(-pwm_X, pwm_Y, -pwm_Z);
       
     } else if (vertical_edge && calibrated && !calibrating) {
+      vertexSpinStableSince = 0;
+      vertexSpinTarget = 0.0f;
       regulate_edge();
     } else {
+      vertexSpinStableSince = 0;
+      vertexSpinTarget = 0.0f;
       XYZ_to_threeWay(0, 0, 0);
       digitalWrite(BRAKE, LOW);
       motors_speed_X = 0;
@@ -266,7 +283,7 @@ void loop() {
     battVoltage((double)analogRead(VBAT) / 204); // value 204 must be selected by measuring battery voltage!
     
     if (Mode == 0 && !calibrated && !calibrating) {
-      Serial.println("Vous devez d'abord calibrer les points d'equilibre (via Bluetooth)...");
+      Serial.println("first you need to calibrate the balancing points (over bluetooth)...");
       SerialBT.println("95");
       if (!calibrated_leds) {
         colorLed(0, LED_LUX, 0, 1, NUM_PIXELS, 0); 

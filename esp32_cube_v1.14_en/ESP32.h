@@ -36,7 +36,6 @@
 #define ACCEL_CONFIG  0x1C   // Accelerometer configuration address
 #define GYRO_CONFIG   0x1B   // Gyro configuration address
 #define PWR_MGMT_1    0x6B
-#define PWR_MGMT_2    0x6C
 
 #define accSens 0            // 0 = 2g, 1 = 4g, 2 = 8g, 3 = 16g
 #define gyroSens 0           // 0 = 250rad/s, 1 = 500rad/s, 2 1000rad/s, 3 = 2000rad/s
@@ -51,12 +50,19 @@
 float K1 = 180.00, K2 = 30.00, K3 = 1.60, K4 = 0.008, zK2 = 8.00, zK3 = 0.30; 
 float eK1 = 190.00, eK2 = 31.00, eK3 = 2.50, eK4 = 0.014;
 
+const bool VERTEX_AUTO_SPIN = true;
+const float VERTEX_SPIN_SPEED = 8.0f;
+const float VERTEX_SPIN_RAMP = 0.03f;
+const float VERTEX_SPIN_MAX_TILT = 2.5f;
+const float VERTEX_SPIN_MAX_GYRO = 12.0f;
+const unsigned long VERTEX_SPIN_DELAY = 5000;
+unsigned long vertexSpinStableSince = 0;
+float vertexSpinTarget = 0.0f;
+
 float Gyro_amount = 0.996;
 
 bool vertical_vertex = false;
 bool vertical_edge = false;
-
-const bool VERTEX_ROTATION_ENABLED = true; // true to automatically rotate the cube in Vertex mode
 
 byte edge_motor = 0;
 byte edge_candidate = 0;
@@ -65,6 +71,7 @@ struct EdgeAxis { float x; float y; };
 const EdgeAxis EDGE_AXES[4] = {
   {0.0f, 0.0f}, {0.464f, 0.886f}, {0.556f, -0.831f}, {-1.0f, 0.0f}
 };
+const char EDGE_LABELS[4] = {'?', 'B', 'C', 'A'};
 const uint32_t EDGE_CONFIRM_MS = 200;
 const float EDGE_ARM_DEG = 0.3f; 
 const float EDGE_CUTOFF_DEG = 7.0f; 
@@ -88,7 +95,7 @@ OffsetsObj offsets;
 float alpha = 0.7;
 
 int16_t  AcX, AcY, AcZ, AcXc, AcYc, AcZc, GyX, GyY, GyZ;
-float gyroX, gyroY, gyroZ, gyroXfilt, gyroYfilt, gyroZfilt;
+float gyroX, gyroY, gyroZ, gyroXfilt, gyroYfilt;
 float speed_X, speed_Y;
 
 int16_t  GyZ_offset = 0; int16_t  GyY_offset = 0; int16_t  GyX_offset = 0;
@@ -103,7 +110,7 @@ long currentT, previousT_1, previousT_2, previousT_3;
 volatile int  enc_count1 = 0, enc_count2 = 0, enc_count3 = 0; 
 int16_t motor1_speed; int16_t motor2_speed; int16_t motor3_speed; 
 
-byte f; word i; byte j; byte k; bool lock; byte Mode;   
+byte f; word i; byte j; bool lock; byte Mode;   
 bool Push; bool LedRGB; byte RGB_val;  bool ChooseColor; 
 byte Red = LED_LUX, Green = LED_LUX, Blue = 0;
 

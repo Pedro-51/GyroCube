@@ -282,8 +282,6 @@ void angle_calc() {
     robot_angleY = Acc_angleY;
     edge_motor = observed;
     vertical_edge = true;
-    Serial.print("EDGE_V117,ACTIVE,");
-    Serial.println(EDGE_LABELS[edge_motor]);
   }
 
   if (vertical_vertex && (abs(robot_angleX) > 7 || abs(robot_angleY) > 7)) {
@@ -293,8 +291,6 @@ void angle_calc() {
       (Mode != 0 || !calibrated || calibrating ||
        !isfinite(robot_angleX) || !isfinite(robot_angleY) ||
        abs(robot_angleX) > EDGE_CUTOFF_DEG || abs(robot_angleY) > EDGE_CUTOFF_DEG)) {
-    Serial.print("EDGE_V117,STOP,");
-    Serial.println(EDGE_LABELS[edge_motor]);
     vertical_edge = false;
     edge_motor = 0;
     edge_candidate = 0;
