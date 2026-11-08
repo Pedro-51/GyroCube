@@ -1,3 +1,10 @@
+
+
+//-------------------------- For Users -----------------------------
+const bool SERIAL_FRENCH = false; // true = French, false = English 
+const bool VERTEX_AUTO_SPIN = true; // true = The cube turns on him even in Vertex
+//------------------------------------------------------------------
+
 #pragma once
 #include <Arduino.h>
 #include <Wire.h>
@@ -50,7 +57,6 @@
 float K1 = 180.00, K2 = 30.00, K3 = 1.60, K4 = 0.008, zK2 = 8.00, zK3 = 0.30; 
 float eK1 = 190.00, eK2 = 31.00, eK3 = 2.50, eK4 = 0.014;
 
-const bool VERTEX_AUTO_SPIN = true;
 const float VERTEX_SPIN_SPEED = 8.0f;
 const float VERTEX_SPIN_RAMP = 0.03f;
 const float VERTEX_SPIN_MAX_TILT = 2.5f;

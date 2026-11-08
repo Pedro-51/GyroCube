@@ -185,7 +185,7 @@ void angle_setup() {
     delay(5);
   }
   GyZ_offset = GyZ_offset_sum >> 9;
-  Serial.print("GyZ offset value = "); Serial.println(GyZ_offset);
+  Serial.print((SERIAL_FRENCH ? "Decalage GyZ = " : "GyZ offset value = ")); Serial.println(GyZ_offset);
   beep();
   colorLed(0, 0, 0, NUM_PIX_MOT*2+1, NUM_PIXELS, 0);
 
@@ -196,7 +196,7 @@ void angle_setup() {
     delay(5);
   }
   GyY_offset = GyY_offset_sum >> 9;
-  Serial.print("GyY offset value = "); Serial.println(GyY_offset);
+  Serial.print((SERIAL_FRENCH ? "Decalage GyY = " : "GyY offset value = ")); Serial.println(GyY_offset);
   beep();
   colorLed(0, 0, 0, NUM_PIX_MOT+1, NUM_PIX_MOT*2, 0);
 
@@ -207,7 +207,7 @@ void angle_setup() {
     delay(5);
   }
   GyX_offset = GyX_offset_sum >> 9;
-  Serial.print("GyX offset value = "); Serial.println(GyX_offset);
+  Serial.print((SERIAL_FRENCH ? "Decalage GyX = " : "GyX offset value = ")); Serial.println(GyX_offset);
   colorLed(0, 0, 0, 1, NUM_PIX_MOT, 150);
   beep();
   beep();
@@ -403,6 +403,12 @@ int Tuning() {
   char cmd = SerialBT.read();                 // get command byte
   switch (param) {
 
+    case 'L':
+      if (cmd == '?') {
+        SerialBT.println(SERIAL_FRENCH ? "LANG:FR" : "LANG:EN");
+      }
+      break;
+
     case 'T': 
       if (cmd == 'x'){
         if (ConnectBT == false){init_BT(); ConnectBT = true;}
@@ -534,8 +540,8 @@ int Tuning() {
       if (cmd == '+' && !calibrating) {
         calibrating = true;
         SerialBT.println("11");
-        Serial.println("Calibration in progress.");
-        Serial.println("Place the cube in vertex position...");
+        Serial.println((SERIAL_FRENCH ? "Calibration en cours." : "Calibration in progress."));
+        Serial.println((SERIAL_FRENCH ? "Placez le cube en position Vertex..." : "Place the cube in vertex position..."));
         colorLed(LED_LUX, LED_LUX, 0, 1, NUM_PIXELS, 0);
         beep(); 
       }
@@ -547,14 +553,14 @@ int Tuning() {
           offsets.acYv = AcY;
           offsets.acZv = AcZ + 16384;
           SerialBT.println("12");
-          Serial.println("Vertex OK.");
-          Serial.println("Place the cube in edge position...");
+          Serial.println((SERIAL_FRENCH ? "Vertex OK." : "Vertex OK."));
+          Serial.println((SERIAL_FRENCH ? "Placez le cube en position Edge..." : "Place the cube in edge position..."));
           vertex_calibrated = true;
           colorLed(0, LED_LUX, LED_LUX, 1, NUM_PIXELS, 0);
           beep();
         } else if (abs(AcX) > 7000 && abs(AcX) < 10000 && abs(AcY) < 2000 && vertex_calibrated) {
           SerialBT.println("13");
-          Serial.println("Edge OK.");
+          Serial.println((SERIAL_FRENCH ? "Edge OK." : "Edge OK."));
           offsets.acXe = AcX;
           offsets.acYe = AcY;
           offsets.acZe = AcZ + 16384;
@@ -562,11 +568,11 @@ int Tuning() {
           save();
           calibrated = true;
           calibrating = false;
-          Serial.println("Calibration OK.");
+          Serial.println((SERIAL_FRENCH ? "Calibration terminee." : "Calibration OK."));
           beep();
         } else {
           SerialBT.println("14");
-          Serial.println("The angles are wrong!!!!!!");
+          Serial.println((SERIAL_FRENCH ? "Les angles sont incorrects !" : "The angles are wrong!!!!!!"));
           beep();
           beep();
         }

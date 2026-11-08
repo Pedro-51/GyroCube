@@ -138,43 +138,43 @@ void loop() {
         case 1:
           colorLed(LED_LUX, LED_LUX, LED_LUX, 1, NUM_PIX_MOT, 0);
           digitalWrite(BRAKE, HIGH);
-          if (lock) Serial.println("Rotation du moteur 1."); SerialBT.println("46");
+          if (lock) Serial.println(SERIAL_FRENCH ? "Rotation du moteur 1." : "Rotating motor 1."); SerialBT.println("46");
           Motor1_control(50);
           break;
         case 4:
           digitalWrite(BRAKE, LOW);
-          if (lock) Serial.println("Arret."); SerialBT.println("41");
+          if (lock) Serial.println(SERIAL_FRENCH ? "Arret." : "Stop."); SerialBT.println("41");
           Motor1_control(0);
           break;      
         case 7:
           digitalWrite(BRAKE, HIGH);
-          if (lock) Serial.println("Changement de sens..."); SerialBT.println("42");
+          if (lock) Serial.println(SERIAL_FRENCH ? "Changement de sens..." : "Change direction..."); SerialBT.println("42");
           Motor1_control(-50);
           break;
         case 10:
           digitalWrite(BRAKE, LOW);
-          if (lock) Serial.println("Arret."); SerialBT.println("41");
+          if (lock) Serial.println(SERIAL_FRENCH ? "Arret." : "Stop."); SerialBT.println("41");
           Motor1_control(0);
           break; 
         case 13:
           digitalWrite(BRAKE, HIGH);
-          if (lock) Serial.println("Verification de l'encodeur..."); SerialBT.println("43");
+          if (lock) Serial.println(SERIAL_FRENCH ? "Verification de l'encodeur..." : "Checking encoder..."); SerialBT.println("43");
           Motor1_control(70);
           break; 
         case 16:
           digitalWrite(BRAKE, LOW);
           if (lock && motor1_speed > 300) {
-            Serial.println("Encodeur OK."); 
-            Serial.print("Vitesse : "); Serial.println(motor1_speed);
+            Serial.println(SERIAL_FRENCH ? "Encodeur OK." : "Encoder OK."); 
+            Serial.print(SERIAL_FRENCH ? "Vitesse : " : "Speed: "); Serial.println(motor1_speed);
             s1.concat(motor1_speed);
             SerialBT.println("44"  + s1);
-            Serial.println("Arret.");
+            Serial.println(SERIAL_FRENCH ? "Arret." : "Stop.");
           } else if (lock && motor1_speed <= 0) {
-            Serial.println("Echec de l'encodeur.");
-            Serial.print("Vitesse : "); Serial.println(motor1_speed);
+            Serial.println(SERIAL_FRENCH ? "Echec de l'encodeur." : "Encoder FAIL.");
+            Serial.print(SERIAL_FRENCH ? "Vitesse : " : "Speed: "); Serial.println(motor1_speed);
             s1.concat(motor1_speed);
             SerialBT.println("45"  + s1);
-            Serial.println("Arret.");
+            Serial.println(SERIAL_FRENCH ? "Arret." : "Stop.");
           }
           s1 = "";
           Motor1_control(0);
@@ -184,43 +184,43 @@ void loop() {
         case 19:
           colorLed(LED_LUX, LED_LUX, LED_LUX, NUM_PIX_MOT+1, NUM_PIX_MOT*2, 0);
           digitalWrite(BRAKE, HIGH);
-          if (lock) Serial.println("Rotation du moteur 2."); SerialBT.println("47");
+          if (lock) Serial.println(SERIAL_FRENCH ? "Rotation du moteur 2." : "Rotating motor 2."); SerialBT.println("47");
           Motor2_control(50);
           break;
         case 22:
           digitalWrite(BRAKE, LOW);
-          if (lock) Serial.println("Arret."); SerialBT.println("41");
+          if (lock) Serial.println(SERIAL_FRENCH ? "Arret." : "Stop."); SerialBT.println("41");
           Motor2_control(0);
           break;      
         case 25:
           digitalWrite(BRAKE, HIGH);
-          if (lock) Serial.println("Changement de sens..."); SerialBT.println("42");
+          if (lock) Serial.println(SERIAL_FRENCH ? "Changement de sens..." : "Change direction..."); SerialBT.println("42");
           Motor2_control(-50);
           break;
         case 28:
           digitalWrite(BRAKE, LOW);
-          if (lock) Serial.println("Arret."); SerialBT.println("41");
+          if (lock) Serial.println(SERIAL_FRENCH ? "Arret." : "Stop."); SerialBT.println("41");
           Motor2_control(0);
           break; 
         case 31:
           digitalWrite(BRAKE, HIGH);
-          if (lock) Serial.println("Verification de l'encodeur..."); SerialBT.println("43");
+          if (lock) Serial.println(SERIAL_FRENCH ? "Verification de l'encodeur..." : "Checking encoder..."); SerialBT.println("43");
           Motor2_control(70);
           break; 
         case 34:
           digitalWrite(BRAKE, LOW);
           if (lock && motor2_speed > 300) {
-            Serial.println("Encodeur OK.");
-            Serial.print("Vitesse : "); Serial.println(motor2_speed);
+            Serial.println(SERIAL_FRENCH ? "Encodeur OK." : "Encoder OK.");
+            Serial.print(SERIAL_FRENCH ? "Vitesse : " : "Speed: "); Serial.println(motor2_speed);
             s1.concat(motor2_speed);
             SerialBT.println("44"  + s1);
-            Serial.println("Arret.");
+            Serial.println(SERIAL_FRENCH ? "Arret." : "Stop.");
           } else if (lock && motor2_speed <= 0) {
-            Serial.println("Echec de l'encodeur.");
-            Serial.print("Vitesse : "); Serial.println(motor2_speed);
+            Serial.println(SERIAL_FRENCH ? "Echec de l'encodeur." : "Encoder FAIL.");
+            Serial.print(SERIAL_FRENCH ? "Vitesse : " : "Speed: "); Serial.println(motor2_speed);
             s1.concat(motor2_speed);
             SerialBT.println("45"  + s1);
-            Serial.println("Arret.");
+            Serial.println(SERIAL_FRENCH ? "Arret." : "Stop.");
           }
           s1 = "";
           Motor2_control(0);
@@ -230,43 +230,43 @@ void loop() {
         case 37:
           colorLed(LED_LUX, LED_LUX, LED_LUX, NUM_PIX_MOT*2+1, NUM_PIXELS, 0);
           digitalWrite(BRAKE, HIGH);
-          if (lock) Serial.println("Rotation du moteur 3."); SerialBT.println("48");
+          if (lock) Serial.println(SERIAL_FRENCH ? "Rotation du moteur 3." : "Rotating motor 3."); SerialBT.println("48");
           Motor3_control(50);
           break;
         case 40:
           digitalWrite(BRAKE, LOW);
-          if (lock) Serial.println("Arret."); SerialBT.println("41");
+          if (lock) Serial.println(SERIAL_FRENCH ? "Arret." : "Stop."); SerialBT.println("41");
           Motor3_control(0);
           break;      
         case 43:
           digitalWrite(BRAKE, HIGH);
-          if (lock) Serial.println("Changement de sens..."); SerialBT.println("42");
+          if (lock) Serial.println(SERIAL_FRENCH ? "Changement de sens..." : "Change direction..."); SerialBT.println("42");
           Motor3_control(-50);
           break;
         case 46:
           digitalWrite(BRAKE, LOW);
-          if (lock) Serial.println("Arret."); SerialBT.println("41");
+          if (lock) Serial.println(SERIAL_FRENCH ? "Arret." : "Stop."); SerialBT.println("41");
           Motor3_control(0);
           break; 
         case 49:
           digitalWrite(BRAKE, HIGH);
-          if (lock) Serial.println("Verification de l'encodeur..."); SerialBT.println("43");
+          if (lock) Serial.println(SERIAL_FRENCH ? "Verification de l'encodeur..." : "Checking encoder..."); SerialBT.println("43");
           Motor3_control(70);
           break; 
         case 52:
           digitalWrite(BRAKE, LOW);
           if (lock && motor3_speed > 300) {
-            Serial.println("Encodeur OK.");
-            Serial.print("Vitesse : "); Serial.println(motor3_speed);
+            Serial.println(SERIAL_FRENCH ? "Encodeur OK." : "Encoder OK.");
+            Serial.print(SERIAL_FRENCH ? "Vitesse : " : "Speed: "); Serial.println(motor3_speed);
             s1.concat(motor3_speed);
             SerialBT.println("44"  + s1);
-            Serial.println("Arret.");
+            Serial.println(SERIAL_FRENCH ? "Arret." : "Stop.");
           } else if (lock && motor3_speed <= 0) {
-            Serial.println("Echec de l'encodeur.");
-            Serial.print("Vitesse : "); Serial.println(motor3_speed);
+            Serial.println(SERIAL_FRENCH ? "Echec de l'encodeur." : "Encoder FAIL.");
+            Serial.print(SERIAL_FRENCH ? "Vitesse : " : "Speed: "); Serial.println(motor3_speed);
             s1.concat(motor3_speed);
             SerialBT.println("45"  + s1);
-            Serial.println("Arret.");
+            Serial.println(SERIAL_FRENCH ? "Arret." : "Stop.");
           }
           s1 = "";
           Motor3_control(0);
@@ -283,7 +283,7 @@ void loop() {
     battVoltage((double)analogRead(VBAT) / 204); // value 204 must be selected by measuring battery voltage!
     
     if (Mode == 0 && !calibrated && !calibrating) {
-      Serial.println("first you need to calibrate the balancing points (over bluetooth)...");
+      Serial.println((SERIAL_FRENCH ? "Vous devez d'abord calibrer les points d'equilibre (via Bluetooth)..." : "first you need to calibrate the balancing points (over bluetooth)..."));
       SerialBT.println("95");
       if (!calibrated_leds) {
         colorLed(0, LED_LUX, 0, 1, NUM_PIXELS, 0); 
@@ -296,7 +296,7 @@ void loop() {
     
     if (Mode == 1){
       f++; 
-      if (f == 53){ beep(); Serial.println("Fin des tests des moteurs."); SerialBT.println("96"); f = 1; Mode = 0;} 
+      if (f == 53){ beep(); Serial.println(SERIAL_FRENCH ? "Fin des tests des moteurs." : "End of engines tests."); SerialBT.println("96"); f = 1; Mode = 0;} 
     lock = 1;
     }
     previousT_2 = currentT;
